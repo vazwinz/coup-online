@@ -285,6 +285,38 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .toast.err{border-color:var(--blood)}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px) scale(.97)}}
 
+/* Anel de vez + contagem regressiva ao redor do assento */
+@property --ang{syntax:'<angle>';inherits:false;initial-value:360deg}
+.clk{position:absolute;inset:-3px;border-radius:15px;pointer-events:none;opacity:0;transition:opacity .3s;padding:3px;
+  background:conic-gradient(from -90deg,var(--brass-hi) var(--ang,360deg),rgb(241 232 212 / .12) 0);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+.me .clk{inset:-4px;border-radius:19px}
+.seat.on .clk,.me.on .clk{opacity:1}
+.seat.counting .clk,.me.counting .clk{animation:drain linear forwards;animation-duration:var(--cd,25s)}
+@keyframes drain{from{--ang:360deg}to{--ang:0deg}}
+
+/* Cinemática de ação pesada */
+.fxvig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 28%,var(--vc,rgb(0 0 0 / .55)) 100%)}
+.cine{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:0 16px}
+.cine-t{font:700 clamp(2.6rem,13vw,6rem)/.95 var(--display);letter-spacing:.05em;text-transform:uppercase;text-wrap:balance;text-shadow:0 4px 34px rgb(0 0 0 / .85),0 2px 3px rgb(0 0 0 / .7)}
+.cine-sub{font:600 clamp(.85rem,3.4vw,1.25rem) var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 12px rgb(0 0 0 / .8)}
+.cine-sub:empty{display:none}
+.fxreact{position:absolute;left:0;top:0;font-size:clamp(34px,8vw,54px);line-height:1;filter:drop-shadow(0 4px 10px rgb(0 0 0 / .6));will-change:transform,opacity}
+
+/* Reações rápidas + chat do lobby */
+.reactbar{display:flex;gap:4px;flex-wrap:wrap}
+.reactbar button{background:rgb(0 0 0 / .25);border:1px solid var(--felt-4);border-radius:9px;padding:3px 8px;font-size:1.15rem;line-height:1.2;transition:transform .12s,border-color .15s,background .15s}
+.reactbar button:hover{transform:translateY(-2px) scale(1.12);border-color:var(--brass);background:var(--felt-3)}
+.reactbar button:active{transform:scale(.9)}
+.lb-chat{display:flex;flex-direction:column;gap:8px}
+#lbChat{list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse;gap:4px;max-height:110px;overflow-y:auto;font-size:.88rem;overscroll-behavior:contain}
+#lbChat li{color:#dceaf3;word-break:break-word}
+#lbChat li b{color:var(--brass-hi)}
+#lbChat:empty::before{content:"Converse enquanto espera…";color:var(--muted);font-style:italic;font-size:.85rem}
+.lb-chat form{display:flex;gap:6px}
+.lb-chat input{flex:1;min-width:0}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -316,12 +348,14 @@ input[type=range]{accent-color:var(--brass);width:100%}
     </div>
     <section class="prompt" id="prompt" aria-live="polite"><div class="ptimer" id="ptimer"></div><p id="ptext"></p><div id="pbtns"></div></section>
     <section class="me" id="me" hidden>
+      <div class="clk"></div>
       <div class="me-info"><span class="st" id="meSt"></span><span class="pn" id="meName"></span><span class="coins" id="meCoins">2</span></div>
       <div class="hand" id="hand"></div>
     </section>
   </section>
   <aside class="side">
     <div class="log"><h2>Registro</h2><ol id="log"></ol></div>
+    <div class="reactbar" id="reactBar" hidden></div>
     <form class="chat" id="chatForm" hidden autocomplete="off"><input type="text" id="chatIn" maxlength="200" placeholder="Mensagem para a mesa" aria-label="Mensagem para a mesa"><button class="btn" type="submit">Enviar</button></form>
   </aside>
 </main>
@@ -371,6 +405,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
     <p class="hint">Mande o código para os amigos. Eles abrem este mesmo arquivo, vão em Online e digitam o código. Até 6 jogadores; quem passar disso assiste.</p>
     <ul class="lb-list" id="lbList"></ul>
     <p class="hint" id="lbTotal"></p>
+    <div class="lb-chat"><ul id="lbChat"></ul><form id="lbChatForm" autocomplete="off"><input type="text" id="lbChatIn" maxlength="200" placeholder="Conversar com a sala" aria-label="Conversar com a sala"><button class="btn" type="submit">Enviar</button></form></div>
     <div id="lbHost" class="tabp">
       <div class="grid3">
         <div class="field"><span>Bots</span><div class="stepper"><button class="btn sm" id="botMinus" aria-label="Menos bots">−</button><output id="botN">1</output><button class="btn sm" id="botPlus" aria-label="Mais bots">+</button></div></div>
@@ -452,6 +487,7 @@ const ACT_SFX={renda:'slap',ajuda:'slap',golpe:'riser',cooperar:'stamp',assassin
 const VAL={burocrata:4.5,assassino:4,capitao:3.5,condessa:3,bufao:2.8};
 const BOTNAMES=['Vex','Marlowe','Isolde','Cassian','Renna','Thessaly','Dorian','Okara','Lucan','Mirela'];
 const SPEEDS={350:'Rápido',750:'Normal',1300:'Lento'};
+const REACTS=['😏','🤥','😱','😂','👏','🤔','🔥','💀'];
 const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -604,6 +640,7 @@ const SFX=(()=>{
     win(B,t){[[261.63,329.63,392],[349.23,440,523.25],[392,493.88,587.33],[523.25,659.25,783.99,1046.5]].forEach((fs,i)=>synth(B,t+i*.2,{freqs:fs,dur:i===3?1.8:.26,a:.012,f0:500,fp:4200,fa:.05,f1:700,q:2,g:.12,rev:.4}));kick(B,t+.6,{f:150,f2:45,dur:.5,g:.7});noise(B,t+.6,{ft:'highpass',f:6500,dur:2,a:.005,g:.2,rev:.4});[2093,2637,3136].forEach((f,i)=>tone(B,t+.65+i*.06,{f,dur:1.4,g:.04,rev:.6}));},
     defeat(B,t){[440,349.23,293.66].forEach((f,i)=>tone(B,t+i*.32,{type:'triangle',f,dur:.9,g:.14,rev:.45}));synth(B,t+.15,{freqs:[146.83,174.61,220],dur:1.8,a:.25,f0:200,fp:900,fa:.4,f1:150,q:2,g:.09,rev:.5});},
     pop(B,t){tone(B,t,{f:620,f2:920,glide:.05,dur:.08,g:.09});},
+    impact(B,t){kick(B,t,{f:160,f2:34,dur:1.1,g:1,glide:.5});noise(B,t,{ft:'lowpass',f:1600,f2:110,dur:.8,a:.004,g:.7,rev:.5});metal(B,t,{f:150,ratios:[1,1.5,2.14,3.1,4.6],decay:[1,.8,.62,.48,.32],dur:1.4,g:.34,rev:.5});noise(B,t,{ft:'highpass',f:2200,dur:.1,g:.4});},
     join(B,t){tone(B,t,{type:'triangle',f:523.25,dur:.25,g:.12,rev:.3});tone(B,t+.09,{type:'triangle',f:783.99,dur:.4,g:.12,rev:.3});}
   };
   function applyVol(){if(B)B.master.gain.setTargetAtTime(muted?0:vol*vol,ctx.currentTime,.02);}
@@ -665,7 +702,7 @@ function idleStatus(){
 /* ---- Montagem e atualização da mesa a partir da view ---- */
 function makeSeat(p){
   const root=document.createElement('div');root.className='seat';
-  root.innerHTML='<div class="seat-h"><span class="pn"></span><span class="coins"></span></div><div class="seat-tag"></div><div class="seat-cards"></div>';
+  root.innerHTML='<div class="clk"></div><div class="seat-h"><span class="pn"></span><span class="coins"></span></div><div class="seat-tag"></div><div class="seat-cards"></div>';
   root.querySelector('.pn').textContent=p.name;root.querySelector('.pn').title=p.name;
   const box=root.querySelector('.seat-cards'),cards=[makeC3('sm'),makeC3('sm')];cards.forEach(c=>box.appendChild(c));
   return {root,coins:root.querySelector('.coins'),tag:root.querySelector('.seat-tag'),cardsBox:box,cards};
@@ -724,6 +761,7 @@ function applyView(v){
     const s=TB.seats.get(p.id);if(!s)continue;
     const alive=p.cards.some(c=>!c.d);
     s.root.classList.toggle('on',v.active===p.id&&!v.over);
+    if(v.active!==p.id||v.over)s.root.classList.remove('counting');
     s.root.classList.toggle('out',!alive);
     if(p.id===v.me)s.tag.textContent=!alive?'Eliminado':v.over?'Fim de jogo':v.active===p.id?'Sua vez':(v.online?'Você':'Sua mão');
     else s.tag.textContent=p.off?'caiu · bot no lugar':(v.online&&p.bot?'bot':'');
@@ -757,7 +795,8 @@ function clearTable(){
 function updateChrome(){
   const rc=$('roomChip');rc.hidden=!NET.code;if(NET.code)rc.textContent='Sala '+NET.code;
   const mc=$('modeChip');mc.hidden=!VIEW;if(VIEW)mc.textContent=MODES[VIEW.mode]||'';
-  $('chatForm').hidden=!(VIEW&&VIEW.online&&NET.role);
+  const chatOn=!!(VIEW&&VIEW.online&&NET.role);
+  $('chatForm').hidden=!chatOn;$('reactBar').hidden=!chatOn;
 }
 
 /* ---- Efeitos ---- */
@@ -856,15 +895,40 @@ function confetti(){
     if(k<1)requestAnimationFrame(step);else cv.remove();};
   requestAnimationFrame(step);
 }
+function cinematic(title,o){
+  o=o||{};
+  if(!reduced()){const v=document.createElement('div');v.className='fxvig';v.style.setProperty('--vc',o.vig||'rgb(0 0 0 / .55)');fxl.appendChild(v);
+    v.animate([{opacity:0},{opacity:1,offset:.22},{opacity:1,offset:.68},{opacity:0}],{duration:T(1500),easing:'ease-out'}).onfinish=()=>v.remove();}
+  const el=document.createElement('div');el.className='cine';el.style.color=o.color||'var(--brass-hi)';
+  el.innerHTML='<span class="cine-sub"></span><span class="cine-t"></span><span class="cine-sub"></span>';
+  const subs=el.querySelectorAll('.cine-sub');subs[0].textContent=o.sub||'';el.querySelector('.cine-t').textContent=title;subs[1].textContent=o.sub2||'';
+  fxl.appendChild(el);
+  if(reduced()){setTimeout(()=>el.remove(),1400);return;}
+  el.animate([{opacity:0,transform:'scale(1.55)',filter:'blur(9px)'},{opacity:1,transform:'scale(1)',filter:'blur(0)',offset:.2},{opacity:1,transform:'scale(1.03)',offset:.78},{opacity:0,transform:'scale(1.07)'}],{duration:T(1550),easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>el.remove();
+}
+function reactPop(pid,emoji){
+  const s=seatOf(pid);let x,y;
+  if(s){const c=centerOf(s.root);x=c.x;y=s.root.getBoundingClientRect().top;}else{x=innerWidth/2;y=innerHeight*.5;}
+  const el=document.createElement('div');el.className='fxreact';el.textContent=emoji;fxl.appendChild(el);
+  SFX.play('pop');
+  if(reduced()){el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`;setTimeout(()=>el.remove(),900);return;}
+  el.animate([{transform:`translate(${x}px,${y+10}px) translate(-50%,-50%) scale(.3)`,opacity:0},{transform:`translate(${x}px,${y-6}px) translate(-50%,-50%) scale(1.25)`,opacity:1,offset:.25},{transform:`translate(${x}px,${y-18}px) translate(-50%,-50%) scale(1)`,opacity:1,offset:.6},{transform:`translate(${x}px,${y-62}px) translate(-50%,-50%) scale(.9)`,opacity:0}],{duration:T(1500),easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>el.remove();
+}
 const FX={
   turn(e){document.querySelectorAll('.aimed').forEach(x=>x.classList.remove('aimed'));if(e.pid===VIEW.me){SFX.play('turn');const pr=$('prompt');pr.classList.remove('mine');void pr.offsetWidth;pr.classList.add('mine');}},
   act(e){
-    const notes=[];if(e.claim)notes.push('diz ter '+R[e.claim].n);if(e.guess)notes.push('chuta '+R[e.guess].n);
-    banner({actor:e.pid,verb:A[e.act].l,target:e.target,note:notes.join(' · ')});
+    const heavy={assassinar:{t:'ASSASSINATO',color:'#ff5a4f',vig:'rgb(70 0 0 / .55)'},golpe:{t:'GOLPE DE ESTADO',color:'#ffd36a',vig:'rgb(50 20 0 / .5)'},extorquir:{t:'EXTORSÃO',color:'#8fc0ec',vig:'rgb(0 15 40 / .45)'},desordem:{t:'DESORDEM',color:'#f0a35a',vig:'rgb(50 25 0 / .45)'}}[e.act];
+    const tgt=e.target!=null?'→ '+pname(e.target):'';
+    if(heavy){const extra=e.guess?' · '+R[e.guess].n+'?':(e.claim?' · diz ter '+R[e.claim].n:'');cinematic(heavy.t,{color:heavy.color,vig:heavy.vig,sub:pname(e.pid),sub2:tgt+extra});}
+    else{const notes=[];if(e.claim)notes.push('diz ter '+R[e.claim].n);banner({actor:e.pid,verb:A[e.act].l,target:e.target,note:notes.join(' · ')});}
     seatClass(e.pid,'acting',700);
     if(e.target!=null){const s=seatOf(e.target);if(s)s.root.classList.add('aimed');if(e.target===VIEW.me){SFX.play('aim');flash('rgb(212 72 63)',.16,520);}}
     SFX.play(ACT_SFX[e.act]||'slap');
+    if(e.act==='assassinar'){SFX.play('impact',{delay:.06});shake(7,520);flash('rgb(90 0 0)',.2,560);}
+    else if(e.act==='golpe'){SFX.play('impact',{delay:.1});shake(9,560);}
   },
+  clock(e){const s=seatOf(e.pid);if(!s)return;const el=s.root;el.classList.remove('counting');void el.offsetWidth;if(e.dur>0){el.style.setProperty('--cd',e.dur+'s');el.classList.add('counting');}},
+  react(e){reactPop(e.pid,e.emoji);},
   coins(e){flyCoins(e.from,e.to,e.n);},
   chal(e){stamp('CONTESTO!');SFX.play('challenge');shake(9,480);flash('rgb(212 72 63)',.22,420);seatClass(e.by,'acting',700);seatClass(e.on,'hit',520);},
   proof(e){SFX.play('truth');revealCard(e.role,`${pname(e.pid)} tinha ${R[e.role].n}`);},
@@ -1053,20 +1117,20 @@ async function chooseAction(p){
   const AUTO='__auto',auto=()=>Object.assign(botAction(p),{auto:true});
   const must=p.coins>=10;
   while(true){
-    const act=await decide(p,{kind:'buttons',text:must?'Você tem 10+ moedas: Golpe de Estado é obrigatório.':'<b>Sua vez.</b> Escolha uma ação.',timer:45,
+    const act=await decide(p,{kind:'buttons',text:must?'Você tem 10+ moedas: Golpe de Estado é obrigatório.':'<b>Sua vez.</b> Escolha uma ação.',timer:25,
       buttons:Object.entries(A).map(([k,X])=>{const bluff=X.claim&&!has(p,X.claim);
         return {v:k,dis:(must&&k!=='golpe')||(X.cost&&p.coins<X.cost),cls:X.claim&&!bluff?'gold':'',
           label:`${X.l}<small>${X.d}${X.claim?' · '+R[X.claim].n:''}</small>${bluff?'<span class="tag">blefe</span>':''}`};})},()=>AUTO);
     if(act===AUTO||!A[act])return auto();
     if(!A[act].t)return {act};
-    const tid=await decide(p,{kind:'buttons',text:`${A[act].l}: escolha o alvo.`,timer:45,
+    const tid=await decide(p,{kind:'buttons',text:`${A[act].l}: escolha o alvo.`,timer:25,
       buttons:[...others(p).map(q=>({label:`${esc(q.name)}<small>${q.coins} moedas · ${lives(q)} carta${lives(q)>1?'s':''}</small>`,v:q.id})),{label:'Voltar',v:null}]},()=>AUTO);
     if(tid===AUTO)return auto();
     if(tid===null||tid===undefined)continue;
     const t=G.players[tid];
     if(act==='golpe'&&mental()){
       const seen=G.know[kkey(p,t)];
-      const g=await decide(p,{kind:'buttons',text:`Golpe em ${nm(t)}. Qual carta ${esc(t.name)} tem?`,timer:45,
+      const g=await decide(p,{kind:'buttons',text:`Golpe em ${nm(t)}. Qual carta ${esc(t.name)} tem?`,timer:25,
         buttons:[...ROLES.map(r=>{const un=3-knownCount(p,r);return {v:r,dis:un<=0,label:`${R[r].n}<small>${un} fora da sua vista${seen===r?' · você viu':''}</small>`};}),{label:'Voltar',v:null}]},()=>AUTO);
       if(g===AUTO)return auto();
       if(!g)continue;
@@ -1079,7 +1143,10 @@ async function chooseAction(p){
 async function takeTurn(p){
   G.active=p.id;fx({k:'turn',pid:p.id});dirty();
   if(p.ctl==='bot')await pause(.9);
+  const timed=p.ctl!=='bot'&&G.online;
+  if(timed)fx({k:'clock',pid:p.id,dur:25});
   const ch=await chooseAction(p);
+  if(timed)fx({k:'clock',pid:p.id,dur:0});
   const {act,target,guess}=ch,X=A[act];
   if(ch.auto)log(`${nm(p)} ficou sem tempo; jogada automática.`,'sys');
   log(`${nm(p)} → ${X.l}${target?` em ${nm(target)}`:''}${guess?` chutando <b>${R[guess].n}</b>`:''}${X.claim?` <i>(diz ter ${R[X.claim].n})</i>`:''}`,'act');
@@ -1352,12 +1419,14 @@ function errText(e){
 }
 function leaveRoom(silent){
   if(NET.role==='client')netSend(NET.hostConn,{t:'leave'});
+  else if(NET.role==='host')netBroadcast({t:'bye',msg:'O host encerrou a sala.'});
   if(NET.role==='host'&&G&&G.online)abortGame();
   if(NET.role==='client'&&G)abortGame();
   clearInterval(NET.hb);
   const peer=NET.peer;
   Object.assign(NET,{role:null,peer:null,code:null,members:[],hostConn:null,rp:new Map(),cp:null,lobbyState:null,myMid:null});
   try{if(peer)setTimeout(()=>{try{peer.destroy();}catch(e){}},120);}catch(e){}
+  const _lc=$('lbChat');if(_lc)_lc.innerHTML='';
   closePrompt();closeOv($('lobbyOv'));updateChrome();
 }
 
@@ -1388,6 +1457,7 @@ function hostConn(conn){
     m.seen=Date.now();
     if(d.t==='answer')hostAnswer(m,d);
     else if(d.t==='chat')hostChat(m,d);
+    else if(d.t==='react')hostReact(m,d.emoji);
     else if(d.t==='leave'){hostGone(m);try{conn.close();}catch(e){}}
   });
   conn.on('close',()=>{if(m)hostGone(m);});
@@ -1466,7 +1536,12 @@ function remotePrompt(p,spec,fb){
 function hostAnswer(m,d){const e=NET.rp.get(d.id);if(!e||!G||e.p.conn!==m.conn)return;if(!validAnswer(e.spec,d.v))return;NET.rp.delete(d.id);e.res(d.v);}
 function failRemote(p){for(const [id,e] of [...NET.rp])if(e.p===p){NET.rp.delete(id);e.res(e.fb());}}
 function cancelAllRemote(){for(const [id,e] of NET.rp)if(e.p.conn)netSend(e.p.conn,{t:'cancel',id});NET.rp.clear();}
-function hostChat(m,d){const text=String(d.text||'').trim().slice(0,200);if(!text||!G||!G.online)return;const now=Date.now();if(m.lastChat&&now-m.lastChat<600)return;m.lastChat=now;log(`<b>${esc(m.name)}</b>: ${esc(text)}`,'chat',{from:m.pid});}
+function hostChat(m,d){const text=String(d.text||'').trim().slice(0,200);if(!text)return;const now=Date.now();if(m.lastChat&&now-m.lastChat<600)return;m.lastChat=now;
+  if(G&&G.online)log(`<b>${esc(m.name)}</b>: ${esc(text)}`,'chat',{from:m.pid});
+  else hostSay(m.name,text);}
+function hostSay(name,text){const msg={t:'say',name,text};for(const mm of NET.members)if(mm.conn)netSend(mm.conn,msg);addLobbyChat(name,text);}
+function hostReact(m,emoji){if(!REACTS.includes(emoji)||!G||!G.online||m.pid==null)return;const now=Date.now();if(m.lastReact&&now-m.lastReact<500)return;m.lastReact=now;fx({k:'react',pid:m.pid,emoji});}
+function addLobbyChat(name,text){const ul=$('lbChat');if(!ul)return;const li=document.createElement('li');li.innerHTML=`<b>${esc(name)}</b>: ${esc(text)}`;ul.prepend(li);while(ul.children.length>40)ul.lastChild.remove();}
 
 /* -- Cliente -- */
 async function joinRoom(name,code){
@@ -1504,6 +1579,8 @@ function clientData(d){
     case'prompt':clientPrompt(d);break;
     case'cancel':if(NET.cp&&NET.cp.id===d.id){NET.cp.h.cancel();NET.cp=null;}break;
     case'full':clientLost('A sala está cheia.');break;
+    case'say':if(typeof d.text==='string')addLobbyChat(String(d.name||'?').slice(0,16),d.text.slice(0,200));break;
+    case'bye':NET.lastJoin=null;clientLost(typeof d.msg==='string'?d.msg.slice(0,80):'O host encerrou a sala.');break;
   }
 }
 function clientPrompt(d){
@@ -1610,11 +1687,16 @@ $('joinGo').onclick=async()=>{
 };
 $('codeIn').addEventListener('input',e=>{const v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');if(v!==e.target.value)e.target.value=v;});
 $('codeIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('joinGo').click();});
-$('chatForm').addEventListener('submit',e=>{
-  e.preventDefault();const text=$('chatIn').value.trim().slice(0,200);if(!text)return;$('chatIn').value='';
-  if(NET.role==='host'&&G&&G.online){const me=NET.members[0];if(me)hostChat(me,{text});}
-  else if(NET.role==='client')netSend(NET.hostConn,{t:'chat',text});
-});
+function sendChatText(text){text=String(text||'').trim().slice(0,200);if(!text)return;
+  if(NET.role==='host'){const me=NET.members[0];if(me)hostChat(me,{text});}
+  else if(NET.role==='client')netSend(NET.hostConn,{t:'chat',text});}
+function sendReact(emoji){
+  if(NET.role==='host'){const me=NET.members[0];if(me)hostReact(me,emoji);}
+  else if(NET.role==='client')netSend(NET.hostConn,{t:'react',emoji});}
+$('chatForm').addEventListener('submit',e=>{e.preventDefault();sendChatText($('chatIn').value);$('chatIn').value='';});
+$('lbChatForm').addEventListener('submit',e=>{e.preventDefault();sendChatText($('lbChatIn').value);$('lbChatIn').value='';});
+$('reactBar').innerHTML=REACTS.map(x=>`<button type="button" aria-label="Reagir ${x}">${x}</button>`).join('');
+$('reactBar').querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{SFX.unlock();sendReact(REACTS[i]);});
 const ICON_ON='<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/>';
 const ICON_OFF='<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/>';
 function updSnd(){$('sndIcon').innerHTML=SFX.muted?ICON_OFF:ICON_ON;$('sndBtn').setAttribute('aria-label',SFX.muted?'Ligar som':'Desligar som');}
@@ -1633,7 +1715,7 @@ const WAKE=(()=>{let s=null,want=false;
 function resumeCheck(){if(NET.role==='client'&&NET.lastJoin&&!NET.reconnecting&&(!NET.hostConn||!NET.hostConn.open))clientLost('reconnect');}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){WAKE.acq();resumeCheck();}});
 window.addEventListener('online',resumeCheck);
-window.addEventListener('beforeunload',()=>{if(NET.role==='client')netSend(NET.hostConn,{t:'leave'});try{NET.peer&&NET.peer.destroy();}catch(e){}});
+window.addEventListener('beforeunload',()=>{if(NET.role==='client')netSend(NET.hostConn,{t:'leave'});else if(NET.role==='host')netBroadcast({t:'bye',msg:'O host saiu.'});try{NET.peer&&NET.peer.destroy();}catch(e){}});
 
 /* ===================== Início ===================== */
 (function init(){

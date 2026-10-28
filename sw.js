@@ -1,5 +1,5 @@
 /* Service worker do Coup — deixa o shell abrir offline (modo solo) e mantém o jogo atualizado quando há rede. */
-const CACHE = 'coup-v1';
+const CACHE = 'coup-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
