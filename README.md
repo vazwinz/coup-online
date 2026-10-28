@@ -12,6 +12,10 @@ Quem cria a sala vira o **host** e a partida roda no navegador dele; os outros e
 - Até 6 jogadores; o resto assiste. Bots completam a mesa.
 - 15 s para contestar/bloquear, 45 s na sua vez. Caiu? Um bot assume até você voltar com o mesmo nome e código.
 
+## No celular
+
+Instalável como app (PWA): abra o link no navegador e use **Adicionar à tela inicial** — abre em tela cheia, sem a barra do navegador. Durante a partida a tela não apaga, e se você sair do app e voltar, o jogo **reconecta sozinho** na mesma sala. O modo contra bots funciona offline depois da primeira abertura.
+
 ## Modos e variantes
 
 - **Clássico** e **Mentalista** (no Golpe você chuta uma carta do alvo).
