@@ -398,10 +398,12 @@ input[type=range]{accent-color:var(--brass);width:100%}
 
 /* ===== Cerimônia do campeão: clima de final de campeonato ===== */
 /* O palco sobe; liga e semana; o monumento sobe com a estátua no escuro; três batidas de coração; luz: a estátua
-   acende em ouro com aura, WINNER abre atrás dela, chuva dourada; o nome é gravado no pedestal.
+   acende em ouro com aura e faíscas, WINNER abre atrás dela; o nome é gravado no pedestal.
    Passos: .up .s2 .s3 .s4 .s5 .s7 .s8; .fin pula pro fim. Foto recortada (fundo transparente) vira estátua;
    foto comum vira retrato emoldurado (.frame). */
-.cer{position:fixed;inset:0;z-index:56;overflow:hidden;display:grid;place-items:center;color:var(--paper);background:#010403;
+/* minmax(0,1fr): a coluna do grid fica na largura da tela. Sem isso o trilho cresce com o conteúdo mais largo: o WINNER
+   entra com letras espaçadas (bem mais largo que a tela) e empurrava a estátua uns 80 px pra direita na revelação. */
+.cer{position:fixed;inset:0;z-index:56;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;color:var(--paper);background:#010403;
   padding:max(12px,env(safe-area-inset-top,0px)) 14px max(12px,env(safe-area-inset-bottom,0px));transform:translateY(100%);-webkit-tap-highlight-color:transparent;user-select:none}
 .cer.up{transform:none;transition:transform .95s cubic-bezier(.16,1,.3,1)}
 .cer:focus{outline:none}
@@ -486,7 +488,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.s5 .cer-fig .g1{opacity:.6;transition:opacity 1.2s}
 .cer.s5 .cer-fig .g2{animation:aura 3.4s ease-in-out .4s infinite alternate both}
 @keyframes aura{from{opacity:.55;transform:scale(1.05)}to{opacity:.95;transform:scale(1.12)}}
-.cer-ped{position:relative;z-index:2;display:grid;place-items:center;width:min(94vw,calc(var(--h) * 1.02),500px);height:clamp(58px,8.6vh,80px);
+.cer-ped{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;width:min(94vw,calc(var(--h) * 1.02),500px);height:clamp(58px,8.6vh,80px);
   background:linear-gradient(180deg,#22352e 0%,#101d18 38%,#060c0a 100%);clip-path:polygon(3.5% 0,96.5% 0,100% 100%,0 100%)}
 .cer.frame .cer-ped{width:min(94vw,calc(var(--h) * .95),460px)}
 .cer-ped::before{content:"";position:absolute;left:3.5%;right:3.5%;top:0;height:3px;background:linear-gradient(90deg,#6b5222,var(--brass-hi) 50%,#6b5222)}
@@ -508,7 +510,6 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer-x{position:absolute;top:max(10px,env(safe-area-inset-top,0px));right:12px;z-index:7;width:38px;height:38px;padding:0;display:grid;place-items:center;border:1px solid rgb(138 116 68 / .6);border-radius:50%;
   background:rgb(0 0 0 / .35);color:var(--muted);font-size:1.3rem;line-height:1}
 .cer-spark{position:fixed;left:0;top:0;z-index:4;width:5px;height:5px;border-radius:50%;pointer-events:none;background:#fff1c8;box-shadow:0 0 10px 3px rgb(255 175 60 / .85)}
-.cer-rain{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}
 /* Pular: tudo no lugar final, sem as animações de entrada */
 .cer.fin.up,.cer.fin .cer-liga,.cer.fin .cer-wk,.cer.fin .cer-mon,.cer.fin .cer-sub,.cer.fin .cer-pic img,.cer.fin .cer-pic .mono,.cer.fin .cer-fig .g1{transition:none}
 .cer.fin .cer-win,.cer.fin .cer-name{animation:none;opacity:1;clip-path:none}
@@ -773,7 +774,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='06/11/2026 · 3'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='06/11/2026 · 4'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -2498,7 +2499,7 @@ async function shareHall(idx){
 }
 
 /* ---- Cerimônia do campeão (clima de final): o palco sobe, liga e semana, o monumento sobe com a estátua no escuro,
-   três batidas de coração, a luz acende o ouro com aura, WINNER abre atrás dele, chuva dourada, o nome é gravado.
+   três batidas de coração, a luz acende o ouro com aura e faíscas, WINNER abre atrás dele, o nome é gravado.
    Toque durante a cerimônia pula pro final. Pelo link ?hall ela espera um toque para começar as batidas:
    o navegador só libera som depois de um toque, e a revelação sem som perde a graça. */
 const CER={timers:[],idx:0,from:'',wait:false,dust:false,bed:null};
@@ -2520,24 +2521,6 @@ function cerSparks(){
     s.animate([{transform:`translate(${cx}px,${cy}px) scale(${z})`,opacity:1},{transform:`translate(${cx+Math.cos(a)*d}px,${cy+Math.sin(a)*d}px) scale(.1)`,opacity:0}],
       {duration:900+Math.random()*900,easing:'cubic-bezier(.1,.8,.3,1)'}).onfinish=()=>s.remove();
   }
-}
-/* Chuva de papel dourado, como nas finais de campeonato (nada de confete colorido de aniversário). */
-function cerRain(){
-  if(reduced())return;
-  const c=$('cer'),cv=document.createElement('canvas');cv.className='cer-rain';c.appendChild(cv);
-  const dpr=Math.min(2,window.devicePixelRatio||1),W=cv.width=Math.round(innerWidth*dpr),H=cv.height=Math.round(innerHeight*dpr),g=cv.getContext('2d');
-  const cols=['#fff3d0','#f6dc9f','#e9c26a','#d4ad62','#b8893a','#8a6a2c'];
-  const ps=Array.from({length:150},()=>({x:Math.random()*W,y:-Math.random()*H*.9-20*dpr,vy:(1.3+Math.random()*1.9)*dpr,sw:Math.random()*6.3,sp:.02+Math.random()*.04,am:(.5+Math.random()*1.5)*dpr,
-    w:(5+Math.random()*6)*dpr,h:(2.5+Math.random()*4)*dpr,r:Math.random()*6,vr:(Math.random()-.5)*.18,c:cols[Math.floor(Math.random()*cols.length)]}));
-  const t0=performance.now(),dur=6500;
-  const step=now=>{
-    if(!cv.isConnected)return;
-    const k=(now-t0)/dur;g.clearRect(0,0,W,H);g.globalAlpha=clamp((1-k)*1.6,0,1);
-    for(const p of ps){p.y+=p.vy;p.sw+=p.sp;p.x+=Math.sin(p.sw)*p.am;p.r+=p.vr;
-      g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillStyle=p.c;g.fillRect(-p.w/2,-p.h/2,p.w,p.h*Math.abs(Math.cos(p.r*1.3))+dpr*.6);g.restore();}
-    if(k<1)requestAnimationFrame(step);else cv.remove();
-  };
-  requestAnimationFrame(step);
 }
 function cerDust(){
   if(CER.dust)return;CER.dust=true;
@@ -2562,7 +2545,7 @@ function openCeremony(idx,o={}){
   const L=HALL.list;if(!L.length)return;
   const i=clamp(idx|0,0,L.length-1),e=L[i],c=$('cer');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();cerBedStop();
-  c.querySelectorAll('.cer-spark,.cer-rain').forEach(x=>x.remove());
+  c.querySelectorAll('.cer-spark').forEach(x=>x.remove());
   $('cerLiga').textContent=HALL.liga;
   $('cerWk').textContent=weekLabel(e).toUpperCase();
   const cut=cerFigure(e);
@@ -2602,22 +2585,21 @@ function cerReveal(){
   cerAdd('s5');
   SFX.play('braam');if(CER.bed)CER.bed.reveal();
   flash('#ffe9b8',.42,700);cerJolt(7);cerSparks();
-  cerAt(250,cerRain);
   cerAt(CER_T.name,()=>{cerAdd('s7');SFX.play('slam');});
   cerAt(CER_T.act,()=>cerAdd('s8'));
 }
-/* Pula para o fim. Se ainda não tinha revelado, a revelação acontece na hora (com som e chuva dourada). */
+/* Pula para o fim. Se ainda não tinha revelado, a revelação acontece na hora (com som e clarão). */
 function cerFinish(){
   const c=$('cer');if(c.classList.contains('s8'))return;
   const revealed=c.classList.contains('s5');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;$('cerTap').hidden=true;
   cerAdd('fin','up','s2','s3','s5','s7','s8');
-  if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);cerRain();}
+  if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);}
 }
 function closeCeremony(then){
   const c=$('cer');if(c.hidden)return;
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();
-  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark,.cer-rain').forEach(x=>x.remove());if(then)then();};
+  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());if(then)then();};
   if(reduced())return done();
   cerAdd('out');setTimeout(done,420);
 }
