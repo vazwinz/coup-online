@@ -1,6 +1,12 @@
 {
   "liga": "Liga de Coup",
   "campeoes": [
-    { "semana": 1, "nome": "Isaac" }
+    {
+      "semana": 1,
+      "nome": "Isaac",
+      "foto": "hall/semana-01-isaac.webp",
+      "rosto": "hall/semana-01-isaac-rosto.webp",
+      "recorte": true
+    }
   ]
 }
