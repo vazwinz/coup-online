@@ -332,8 +332,12 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .wk::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 35%,rgb(255 240 200 / .2) 50%,transparent 65%);
   transform:translateX(-120%);animation:wkShine 5s ease-in-out 1.2s infinite}
 @keyframes wkShine{0%,64%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
-/* campeão novo (ainda não visto neste aparelho): a placa da semana mais recente respira */
-.weeks.fresh .wk:last-child{border-color:var(--brass);animation:wkGlow 2.4s ease-in-out infinite alternate}
+/* campeão novo (ainda não visto neste aparelho) ou placar que mudou desde a última olhada: a placa respira */
+.weeks.fresh .wk.newest,.wk.live.upd{border-color:var(--brass);animation:wkGlow 2.4s ease-in-out infinite alternate}
+/* semana em andamento: bolinha de "ao vivo" antes do nome; tocar abre o placar */
+.wk.live span::before{content:"";display:inline-block;width:.36em;height:.36em;margin:0 .62em .14em 0;border-radius:50%;vertical-align:middle;
+  background:#e2553f;animation:liveDot 1.7s ease-out infinite}
+@keyframes liveDot{0%{box-shadow:0 0 0 0 rgb(226 85 63 / .6)}75%,100%{box-shadow:0 0 0 .5em rgb(226 85 63 / 0)}}
 @keyframes wkGlow{from{box-shadow:inset 0 0 0 4px rgb(17 38 31 / .92),inset 0 0 0 5px rgb(212 173 98 / .3),0 0 0 rgb(239 205 134 / 0)}
   to{box-shadow:inset 0 0 0 4px rgb(17 38 31 / .92),inset 0 0 0 5px rgb(212 173 98 / .5),0 0 22px rgb(239 205 134 / .3)}}
 .wk-dots{display:flex;justify-content:center;gap:7px;margin-top:9px}
@@ -389,7 +393,34 @@ input[type=range]{accent-color:var(--brass);width:100%}
 /* Coroa ao lado do nome do campeão atual, na sala e na mesa */
 .champ-n::before{content:"";display:inline-block;width:1.05em;height:.8em;margin-right:.28em;vertical-align:-.03em;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48'%3E%3Cpath d='M8 38 4 14l16 12L32 8l12 18 16-12-4 24z' fill='%23efcd86'/%3E%3Crect x='7' y='37' width='50' height='9' rx='2' fill='%23d4ad62'/%3E%3C/svg%3E") center/contain no-repeat}
-@media (prefers-reduced-motion:reduce){.trophy .pc::after,.wk::after{display:none}.trophy.swap,.weeks,.weeks.fresh .wk:last-child{animation:none}}
+@media (prefers-reduced-motion:reduce){.trophy .pc::after,.wk::after{display:none}.trophy.swap,.weeks,.weeks.fresh .wk.newest,.wk.live.upd,.wk.live span::before{animation:none}}
+/* Placar da semana em andamento (lido do placar.txt) */
+.sheet.lb{max-width:480px;text-align:center;gap:18px}
+.lb-h{display:flex;flex-direction:column;gap:5px;align-items:center}
+.lb-h .kick{font-size:.7rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted)}
+.lb-h h2{font-size:2.15rem;color:var(--brass-hi)}
+.lb-st{display:inline-flex;align-items:center;gap:.55em;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.13em;color:var(--brass);font-variant-numeric:tabular-nums}
+.lb-st.live::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:#e2553f;animation:liveDot 1.7s ease-out infinite}
+.lb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;text-align:left}
+.lb-list li{display:grid;grid-template-columns:2.3em minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 14px;border:1px solid rgb(212 173 98 / .16);border-radius:12px;
+  background:rgb(255 255 255 / .025);animation:lbIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 45ms)}
+@keyframes lbIn{from{opacity:0;transform:translateY(8px)}}
+.sheet.lb.quiet .lb-list li{animation:none}
+.lb-list .pos{font:700 1.15rem/1 var(--display);color:var(--muted);font-variant-numeric:tabular-nums}
+.lb-list .nm{min-width:0;font-weight:600;font-size:1.02rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-list .pt{font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lb-list .pt small{margin-left:.3em;font-size:.66rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.lb-list .p1 .pos{color:#efcd86}
+.lb-list .p2 .pos{color:#cfd6da}
+.lb-list .p3 .pos{color:#cf9561}
+/* quem lidera ganha a linha de ouro */
+.lb-list .lead{padding:15px 14px;border-color:var(--brass);background:linear-gradient(90deg,rgb(212 173 98 / .2),rgb(212 173 98 / .05));
+  box-shadow:0 0 26px rgb(239 205 134 / .13),inset 0 0 0 1px rgb(239 205 134 / .1)}
+.lb-list .lead .pos{font-size:1.5rem}
+.lb-list .lead .nm{font:700 1.4rem/1.15 var(--display);letter-spacing:.03em;color:var(--brass-hi)}
+.lb-list .lead .pt{font-size:1.3rem;color:var(--brass-hi)}
+.hall-h .linkbtn{margin-top:6px}
+@media (prefers-reduced-motion:reduce){.lb-list li,.lb-st.live::before{animation:none}}
 /* Foto recortada (estátua) nas cartas do Hall: em pé no fundo da carta, com luz dourada atrás */
 .trophy .pc.cut,.hof .pc.cut{background:radial-gradient(ellipse 85% 55% at 50% 42%,rgb(212 160 70 / .3),transparent 70%),radial-gradient(circle at 50% 100%,#2a2010,#0b0905 72%)}
 .trophy .pc.cut img,.hof .pc.cut img{object-fit:contain;object-position:50% 100%!important;filter:drop-shadow(0 0 10px rgb(255 190 80 / .35))}
@@ -712,6 +743,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 <div class="overlay" id="hallOv" hidden>
   <div class="sheet hall" id="hallBox" role="dialog" aria-labelledby="hallTitle"></div>
 </div>
+<div class="overlay" id="lbOv" hidden>
+  <div class="sheet lb" id="lbBox" role="dialog" aria-labelledby="lbTitle"></div>
+</div>
 
 <div class="cer" id="cer" hidden role="dialog" aria-modal="true" aria-labelledby="cerName" tabindex="-1">
   <div class="cer-sky"></div>
@@ -776,7 +810,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='06/11/2026 · 5'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='06/11/2026 · 6'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -2242,7 +2276,7 @@ function openMenu(){
   setMenuMsg('');
   openOv($('menuOv'));
   requestAnimationFrame(wkHome);
-  loadHall(false);
+  loadHall(false);loadPlacar(false);
 }
 $('menuBtn').onclick=()=>openMenu();
 $('resumeBtn').onclick=()=>closeOv($('menuOv'));
@@ -2296,7 +2330,7 @@ $('imgBtn').onclick=()=>{renderSlots();openOv($('imgOv'));};
 $('closeImg').onclick=()=>closeOv($('imgOv'));
 $('rulesBtn').onclick=()=>openOv($('rulesOv'));
 $('closeRules').onclick=()=>closeOv($('rulesOv'));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cer').hidden)return closeCeremony();for(const id of ['imgOv','rulesOv','hallOv'])if(!$(id).hidden)closeOv($(id));}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cer').hidden)return closeCeremony();for(const id of ['lbOv','imgOv','rulesOv','hallOv'])if(!$(id).hidden){closeOv($(id));break;}}});
 /* -- Mobile: tela acesa + reconexão ao voltar pro app -- */
 const WAKE=(()=>{let s=null,want=false;
   async function acq(){if(!want||s||document.visibilityState!=='visible'||!('wakeLock'in navigator))return;try{s=await navigator.wakeLock.request('screen');s.addEventListener('release',()=>{s=null;});}catch(e){}}
@@ -2377,29 +2411,36 @@ async function loadHall(force){
   if(!$('hallOv').hidden&&(JSON.stringify(HALL.list)!==before||!hadData))renderHall();
   // Abriu pelo link ?hall: assim que os dados chegam, começa a cerimônia (ou o Hall, se não tiver campeão)
   if(HALL.pendingCer&&HALL.state!=='loading'){HALL.pendingCer=false;if(HALL.list.length)openCeremony(0,{gated:true});else openHall();}
+  placarLink();
 }
 /* Placa das semanas no Menu, em ordem: Semana 1 à esquerda, a mais recente à direita (é a que aparece primeiro).
-   Só o rótulo da semana, sem foto nem nome; tocar abre a cerimônia daquela semana. */
+   Só o rótulo da semana, sem foto nem nome; tocar abre a cerimônia daquela semana. A semana em andamento (placar.txt)
+   entra na ponta direita com a bolinha de ao vivo e abre o placar. */
 let WK_SIG='';
 function renderChamp(){
-  const box=$('champBox'),L=HALL.list;
-  box.hidden=!L.length;if(!L.length){WK_SIG='';return;}
-  box.classList.toggle('fresh',LS.get('coup-hall-seen','')!==champKey(L[0]));
-  const chrono=[...L].reverse(),sig=JSON.stringify(chrono.map(e=>[e.wk,e.label]));
-  if(sig===WK_SIG)return; // mesma lista: não refaz (e não perde a semana em que a pessoa parou)
-  WK_SIG=sig;
-  const tr=$('wkTrack'),dots=$('wkDots'),multi=L.length>1;
-  box.classList.toggle('multi',multi);tr.innerHTML='';dots.innerHTML='';dots.hidden=!multi;
-  chrono.forEach((e,k)=>{
-    const b=document.createElement('button');b.type='button';b.className='wk';
-    const t=document.createElement('span');t.textContent=weekLabel(e).toUpperCase();b.appendChild(t);
-    b.setAttribute('aria-label',`${weekLabel(e)}. Toque para ver.`);
-    b.onclick=()=>openCeremony(L.length-1-k);
-    tr.appendChild(b);if(multi)dots.appendChild(document.createElement('i'));
-  });
-  WK_HOME=true;requestAnimationFrame(wkHome);
+  const box=$('champBox'),L=HALL.list,lv=liveWeek(),n=L.length+(lv?1:0);
+  box.hidden=!n;if(!n){WK_SIG='';return;}
+  box.classList.toggle('fresh',!!L.length&&LS.get('coup-hall-seen','')!==champKey(L[0]));
+  const chrono=[...L].reverse(),sig=JSON.stringify([chrono.map(e=>[e.wk,e.label]),lv]);
+  if(sig!==WK_SIG){ // mesma lista: não refaz (e não perde a semana em que a pessoa parou)
+    WK_SIG=sig;
+    const tr=$('wkTrack'),dots=$('wkDots'),multi=n>1;
+    box.classList.toggle('multi',multi);tr.innerHTML='';dots.innerHTML='';dots.hidden=!multi;
+    const add=(label,aria,cls,fn)=>{
+      const b=document.createElement('button');b.type='button';b.className='wk'+cls;
+      const t=document.createElement('span');t.textContent=label;b.appendChild(t);
+      b.setAttribute('aria-label',aria);b.onclick=fn;
+      tr.appendChild(b);if(multi)dots.appendChild(document.createElement('i'));
+    };
+    chrono.forEach((e,k)=>add(weekLabel(e).toUpperCase(),`${weekLabel(e)}. Toque para ver.`,k===chrono.length-1?' newest':'',()=>openCeremony(L.length-1-k)));
+    if(lv)add(`SEMANA ${lv.wk}`,`Semana ${lv.wk}, ${lv.ended?'encerrada':'em andamento'}. Toque para ver o placar.`,' live',()=>openPlacar());
+    WK_HOME=true;requestAnimationFrame(wkHome);
+  }
+  const lb=$('wkTrack').querySelector('.wk.live');
+  if(lb)lb.classList.toggle('upd',LS.get('coup-lb-seen','')!==placarKey());
 }
-/* Leva a placa pra semana mais recente. Com o Menu fechado (largura zero) fica pendente até ele abrir de novo. */
+/* Leva a placa pra semana mais recente (a ponta direita: a semana em andamento, se tiver). Com o Menu fechado
+   (largura zero) fica pendente até ele abrir de novo. */
 let WK_HOME=false;
 function wkHome(){
   const tr=$('wkTrack');if(!WK_HOME||!tr.clientWidth)return;
@@ -2432,6 +2473,8 @@ function renderHall(swap){
   const box=$('hallBox'),L=HALL.list;box.innerHTML='';
   const h=document.createElement('header');h.className='hall-h';
   h.innerHTML=`<span class="kick">${esc(HALL.liga)}</span><h2 id="hallTitle">Hall da Fama</h2>`;box.appendChild(h);
+  const lv=liveWeek();
+  if(lv){const a=document.createElement('button');a.type='button';a.className='linkbtn';a.textContent=`Placar da Semana ${lv.wk}`;a.onclick=()=>openPlacar();h.appendChild(a);}
   if(!L.length){
     const p=document.createElement('p');p.className='msg';
     p.textContent=HALL.state==='err'?'Não consegui carregar o Hall da Fama. Confira a internet e tente de novo.':HALL.state==='ok'||HALL.state==='off'?'Ainda não tem campeão registrado.':'Carregando…';
@@ -2497,6 +2540,126 @@ async function shareHall(idx){
     catch(err){if(err&&err.name==='AbortError')return;}
   }
   try{await navigator.clipboard.writeText(`${text} ${url}`);toast('Copiado. Cola no grupo.');}
+  catch(err){toast('Não deu pra copiar. O link é '+url,true);}
+}
+
+/* ===================== Placar da semana ===================== */
+/* A semana que está rolando, com o placar lido do placar.txt (dá pra editar pelo próprio GitHub ou pelo note).
+   Fica na placa do Menu até a semana ganhar campeão no hall.json; aí vira cerimônia e o arquivo passa pra próxima. */
+const PLACAR={state:'idle',at:0,wk:0,fim:null,rows:[],pending:false};
+const WDAY=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+/* Último dia da semana: 13/11, 13/11/2026 ou 2026-11-13. Vale até o fim desse dia. Sem ano, o mais perto de hoje. */
+function parseFim(v){
+  const s=String(v);let y=null,m,d,r=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(r){y=+r[1];m=+r[2];d=+r[3];}
+  else if((r=s.match(/(\d{1,2})[\/.-](\d{1,2})(?:[\/.-](\d{4}|\d{2}))?/))){d=+r[1];m=+r[2];if(r[3])y=r[3].length===2?2000+ +r[3]:+r[3];}
+  else return null;
+  const mk=yy=>{const t=new Date(yy,m-1,d,23,59,59,999);return t.getMonth()===m-1&&t.getDate()===d?t:null;};
+  if(y!=null)return mk(y);
+  const now=Date.now(),yy=new Date().getFullYear();
+  return [yy-1,yy,yy+1].map(mk).filter(Boolean).sort((a,b)=>Math.abs(a-now)-Math.abs(b-now))[0]||null;
+}
+/* Lê o placar.txt. Cabeçalho: "semana: 2" e (opcional) "fim: 13/11". Depois um jogador por linha, nome e pontos:
+   "Isaac 12", "Isaac: 12", "Isaac - 12 pts", "1º Isaac 12". Linha com # é comentário. Nome repetido: vale a última
+   linha. Sem número, entra com 0. A posição respeita empate (1º, 1º, 3º). */
+function parsePlacar(txt){
+  const out={wk:0,fim:null,rows:[]},seen=new Map();
+  String(txt).replace(/^﻿/,'').split(/\r\n?|\n/).slice(0,300).forEach(line=>{
+    let s=line.replace(/[\u0000-\u001f\u007f]/g,' ').trim();
+    if(!s||s[0]==='#'||s.startsWith('//'))return;
+    const h=s.match(/^(semana|fim|termina|at[eé])(?=[\s:=]|$)\s*[:=]?\s*(.*)$/i);
+    if(h){if(/^semana$/i.test(h[1])){const n=h[2].match(/\d{1,3}/);if(n&&+n[0]>0)out.wk=+n[0];}else out.fim=parseFim(h[2]);return;}
+    s=s.replace(/\s+#.*$/,'').replace(/\s*\([^()]*\)\s*$/,'').trim(); // comentário no fim da linha e "(observação)"
+    const m=s.match(/^(.*?)[\s:=|–—-]*(\d{1,6})\s*(?:pts?|pontos?)?\.?$/i),has=!!(m&&m[1].trim());
+    const nome=cleanTxt((has?m[1]:s).replace(/^\d{1,3}\s*[º°ª.)\-–—:]\s*/,'').replace(/[\s:=|–—-]+$/,''),24);
+    if(!nome)return;
+    seen.set(normN(nome),{nome,pts:has?+m[2]:0});
+  });
+  out.rows=[...seen.values()].sort((a,b)=>b.pts-a.pts||a.nome.localeCompare(b.nome,'pt-BR'));
+  out.rows.forEach((r,i,a)=>{r.pos=i&&a[i-1].pts===r.pts?a[i-1].pos:i+1;});
+  return out;
+}
+const placarKey=()=>`${PLACAR.wk}|${PLACAR.rows.map(r=>`${r.nome}:${r.pts}`).join(',')}`;
+/* A semana do placar só aparece enquanto não tem campeão dela (nem de uma semana depois) no hall.json */
+function liveWeek(){
+  const P=PLACAR;if(P.state!=='ok'||!P.wk||HALL.list.some(e=>e.wk>=P.wk))return null;
+  return {wk:P.wk,ended:!!P.fim&&Date.now()>P.fim};
+}
+function placarStatus(){
+  const f=PLACAR.fim;if(!f)return {txt:'Em andamento',live:true};
+  if(Date.now()>f)return {txt:'Encerrada · campeão em breve',live:false};
+  const t=new Date(),d=Math.round((new Date(f.getFullYear(),f.getMonth(),f.getDate())-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5);
+  const dia=`${WDAY[f.getDay()]}, ${String(f.getDate()).padStart(2,'0')}/${String(f.getMonth()+1).padStart(2,'0')}`;
+  return {txt:d<=0?'Termina hoje':d===1?`Termina amanhã · ${dia}`:`Termina em ${d} dias · ${dia}`,live:true};
+}
+async function loadPlacar(force){
+  if(PLACAR.state==='loading')return;
+  if(!force&&PLACAR.state==='ok'&&Date.now()-PLACAR.at<60e3)return;
+  if(!/^https?:$/.test(location.protocol)){PLACAR.state='off';placarLink();return;} // aberto como arquivo: sem placar
+  const before=placarKey();PLACAR.state='loading';
+  try{
+    // no-cache: confere com o servidor a cada vez, então o que mudar no placar.txt aparece assim que o site atualizar
+    const r=await fetch('placar.txt',{cache:'no-cache'});
+    if(r.status===404)Object.assign(PLACAR,{state:'none',wk:0,fim:null,rows:[],at:Date.now()});
+    else{
+      if(!r.ok)throw new Error('http '+r.status);
+      const txt=await r.text();
+      // sem internet e sem cópia guardada, o service worker devolve a página do jogo: isso não é placar
+      if(/html/i.test(r.headers.get('content-type')||'')||/^\s*</.test(txt))throw new Error('não é o placar');
+      Object.assign(PLACAR,parsePlacar(txt),{state:'ok',at:Date.now()});
+    }
+  }catch(e){PLACAR.state=PLACAR.wk?'ok':'err';}
+  // placar aberto na tela: atualiza sem animar de novo, e o que está na tela conta como visto
+  if(!$('lbOv').hidden&&liveWeek()){if(placarKey()!==before)renderPlacar(true);LS.set('coup-lb-seen',placarKey());}
+  renderChamp();placarLink();
+}
+/* Link ?placar (mandado no grupo): abre o placar assim que o placar e o Hall chegarem. Sem semana rolando, abre o Hall. */
+function placarLink(){
+  if(!PLACAR.pending||['idle','loading'].includes(PLACAR.state)||['idle','loading'].includes(HALL.state))return;
+  PLACAR.pending=false;
+  if(liveWeek())openPlacar();else openHall();
+}
+function renderPlacar(quiet){
+  const box=$('lbBox'),P=PLACAR,st=placarStatus();box.innerHTML='';box.classList.toggle('quiet',!!quiet);
+  const h=document.createElement('header');h.className='lb-h';
+  h.innerHTML=`<span class="kick">${esc(HALL.liga)} · Placar</span><h2 id="lbTitle">Semana ${P.wk}</h2><span class="lb-st${st.live?' live':''}"></span>`;
+  h.querySelector('.lb-st').textContent=st.txt;box.appendChild(h);
+  if(!P.rows.length){const p=document.createElement('p');p.className='msg';p.textContent='Ninguém pontuou ainda.';box.appendChild(p);}
+  else{
+    const ol=document.createElement('ol');ol.className='lb-list';
+    P.rows.forEach((r,i)=>{
+      const li=document.createElement('li');li.className='p'+Math.min(r.pos,4)+(r.pos===1?' lead':'');li.style.setProperty('--i',Math.min(i,12));
+      const pos=document.createElement('span');pos.className='pos';pos.textContent=r.pos+'º';
+      // coroa em quem é o campeão atual (o da última semana fechada)
+      const nm=document.createElement('span');nm.className='nm';nm.textContent=r.nome;nm.dataset.pname=r.nome;nm.classList.toggle('champ-n',isChamp(r.nome));
+      const pt=document.createElement('span');pt.className='pt';pt.textContent=r.pts;
+      const u=document.createElement('small');u.textContent=r.pts===1?'pt':'pts';pt.appendChild(u);
+      li.append(pos,nm,pt);ol.appendChild(li);
+    });
+    box.appendChild(ol);
+  }
+  const f=document.createElement('div');f.className='hall-foot';
+  const btn=(txt,cls,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn '+cls;b.textContent=txt;b.onclick=fn;f.appendChild(b);};
+  if(P.rows.length)btn('Compartilhar','gold',()=>sharePlacar());
+  btn('Fechar','',()=>closeOv($('lbOv')));
+  box.appendChild(f);
+}
+function openPlacar(){
+  if(!liveWeek())return;
+  renderPlacar();openOv($('lbOv'));SFX.play('hum');
+  LS.set('coup-lb-seen',placarKey());renderChamp();
+  loadPlacar(Date.now()-PLACAR.at>15e3);
+}
+async function sharePlacar(){
+  const P=PLACAR;if(!P.rows.length)return;
+  const st=placarStatus(),url=baseUrl()+'?placar',med=['🥇','🥈','🥉'];
+  const lines=P.rows.slice(0,10).map(r=>`${med[r.pos-1]||r.pos+'º'} ${r.nome} — ${r.pts}`);
+  const text=`🏆 ${HALL.liga} · Semana ${P.wk} (${st.live?'parcial':'final'})\n${lines.join('\n')}`;
+  if(navigator.share){
+    try{await navigator.share({title:`Placar · Semana ${P.wk}`,text,url});return;}
+    catch(err){if(err&&err.name==='AbortError')return;}
+  }
+  try{await navigator.clipboard.writeText(`${text}\n${url}`);toast('Copiado. Cola no grupo.');}
   catch(err){toast('Não deu pra copiar. O link é '+url,true);}
 }
 
@@ -2626,7 +2789,8 @@ $('cerNext').onclick=()=>{
   $('verTxt').textContent='Versão de '+VERSION;
   refreshArt();idleStatus();updateChrome();openOv($('menuOv'));
   if(new URLSearchParams(location.search).has('hall'))HALL.pendingCer=true; // link do Hall compartilhado no grupo: abre na cerimônia
-  loadHall(true);
+  if(new URLSearchParams(location.search).has('placar'))PLACAR.pending=true; // link do placar: abre direto nele
+  loadHall(true);loadPlacar(true);
   if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
 window.__coup={get G(){return G;},get VIEW(){return VIEW;},NET,SFX,HALL,validAnswer};

@@ -1,0 +1,16 @@
+# Placar da Liga de Coup. O jogo lê este arquivo e mostra na placa "SEMANA N" do Menu.
+#
+# semana: o número da semana que está rolando.
+# fim: o último dia da semana (dd/mm). É opcional: com ele, o placar mostra quanto falta.
+#
+# Embaixo, um jogador por linha, com o nome e os pontos. Por exemplo:
+#   Isaac 12
+#   Vaz: 9
+#   João Pedro - 7
+# A ordem não importa: o jogo ordena e mostra os empates. Linhas que começam com # são ignoradas.
+#
+# Quando a semana fechar, o campeão vai pro hall.json (aí a placa vira a cerimônia dele).
+# Aqui você troca pra próxima semana e zera os pontos.
+
+semana: 2
+

@@ -48,6 +48,27 @@ Outros campos opcionais: `"data"` (ex.: `"2026-11-09"`, aparece no Hall), `"fras
 
 Foto de celular costuma guardar a localização de onde foi tirada; tire esses dados antes de subir. O site atualiza em 1 a 2 minutos, e todo mundo vê o campeão novo na próxima vez que abrir o jogo.
 
+## Placar da semana
+
+A semana que está rolando aparece na ponta da placa do Menu, com uma bolinha vermelha de **ao vivo**. Tocando nela abre o **placar**: posição, nome e pontos, com empate dividindo a posição, o líder em destaque, coroa no campeão atual e quanto falta pra semana acabar. Quando o placar muda, a placa volta a brilhar até a pessoa olhar. O botão **Compartilhar** manda o placar pro grupo, com o link `https://vazwinz.github.io/coup-online/?placar`, que abre direto nele.
+
+Os dados ficam em [`placar.txt`](placar.txt). Dá pra editar pelo próprio GitHub (abra o arquivo e toque no lápis) ou pelo note, com git:
+
+```
+semana: 2
+fim: 13/11
+
+Isaac 12
+Vaz: 9
+João Pedro - 7
+```
+
+- `semana`: o número da semana que está rolando. Sem ele, o placar não aparece.
+- `fim` (opcional): o último dia da semana (`13/11`, `13/11/2026` ou `2026-11-13`). Com ele, o placar mostra quanto falta e, depois do dia, "Encerrada · campeão em breve".
+- Um jogador por linha, nome e pontos. Vale `Isaac 12`, `Isaac: 12`, `Isaac - 12 pts` e lista numerada (`1. Isaac 12`). A ordem não importa: o jogo ordena. Linha com `#` é comentário. Nome repetido vale a última linha.
+
+Quando a semana fechar, o campeão entra no `hall.json` e a placa daquela semana vira a cerimônia. Aí, no `placar.txt`, troque pra próxima semana e zere os pontos. Depois de salvar, o site atualiza em 1 a 2 minutos.
+
 ## Imagens das cartas
 
 As ilustrações padrão são SVG próprios. Você pode subir suas próprias imagens pelo botão **Cartas** — elas ficam salvas **só no seu navegador** (localStorage), nunca neste repositório.
