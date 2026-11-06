@@ -1,4 +1,6 @@
 {
   "liga": "Liga de Coup",
-  "campeoes": []
+  "campeoes": [
+    { "semana": 1, "nome": "Isaac" }
+  ]
 }

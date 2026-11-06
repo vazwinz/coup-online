@@ -29,7 +29,9 @@ Quando a partida acaba, o jogo revela o que ficou escondido: quem blefou sem nin
 
 ## Hall da Fama
 
-O Menu mostra o campeão da semana da liga, e o **Hall da Fama** guarda todos os campeões, com foto e contagem de títulos. Quem está com o nome do campeão atual aparece com uma **coroa** na sala e na mesa. Link direto para mandar no grupo: `https://vazwinz.github.io/coup-online/?hall`
+O Menu mostra o campeão da semana da liga. Tocando nele começa a **cerimônia**: o palco sobe, a carta do campeão aparece virada num pódio, rufam os tambores e ela se revela com **SEMANA N WINNER**, holofotes, confete e a coroa caindo. Depois vem o **Hall da Fama**, com todos os campeões, fotos e contagem de títulos. Quem está com o nome do campeão atual aparece com uma **coroa** na sala e na mesa.
+
+Link direto para mandar no grupo: `https://vazwinz.github.io/coup-online/?hall`. Ele abre na cerimônia e espera um toque para revelar o campeão (o navegador só libera som depois de um toque).
 
 Para registrar o campeão da semana:
 
@@ -37,10 +39,10 @@ Para registrar o campeão da semana:
 2. Adicione uma entrada em `hall.json`, dentro de `campeoes`:
 
 ```json
-{ "nome": "Isaac", "data": "2026-11-02", "foto": "hall/2026-11-02-isaac.webp" }
+{ "semana": 2, "nome": "Fulano", "foto": "hall/semana-02-fulano.webp" }
 ```
 
-Campos opcionais: `"frase"` (aparece embaixo da foto), `"semana"` (troca o "Semana de 02/11" por outro texto, tipo "Semana 7"), `"apelidos"` (outros nomes que também ganham a coroa, ex.: `["Zac"]`) e `"enquadramento"` (ex.: `"50% 20%"`, se o rosto ficar cortado). Entrada sem foto aparece com a inicial do nome.
+Campos opcionais: `"data"` (ex.: `"2026-11-09"`, aparece no Hall), `"frase"` (aparece embaixo da foto), `"apelidos"` (outros nomes que também ganham a coroa, ex.: `["Zac"]`) e `"enquadramento"` (ex.: `"50% 20%"`, se o rosto ficar cortado). Sem `"semana"`, as semanas são numeradas na ordem do arquivo. Entrada sem foto aparece com a inicial do nome.
 
 Foto de celular costuma guardar a localização de onde foi tirada; tire esses dados antes de subir. O site atualiza em 1 a 2 minutos, e todo mundo vê o campeão novo na próxima vez que abrir o jogo.
 
