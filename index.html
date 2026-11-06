@@ -426,8 +426,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.s5 .cer-rays{opacity:1;transition:opacity 1.8s .1s}
 @keyframes raysSpin{to{transform:rotate(360deg)}}
 /* refletores de estádio: piscam nas batidas e acendem de vez na revelação */
-.cer-beam{position:absolute;top:-6%;width:30vmax;height:110vh;opacity:0;pointer-events:none;transform-origin:50% 0;
-  background:linear-gradient(to bottom,rgb(255 240 205 / .5),rgb(255 240 205 / .1) 60%,transparent 90%);clip-path:polygon(48% 0,52% 0,100% 100%,0 100%)}
+.cer-beam{position:absolute;top:-6%;width:30vmax;height:110vh;opacity:0;pointer-events:none;transform-origin:50% 0;will-change:opacity;
+  /* cone de luz desenhado em SVG (sem clip-path, pelo mesmo motivo do pedestal) */
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff0cd' stop-opacity='.5'/%3E%3Cstop offset='.6' stop-color='%23fff0cd' stop-opacity='.1'/%3E%3Cstop offset='.9' stop-color='%23fff0cd' stop-opacity='0'/%3E%3C/linearGradient%3E%3Cpolygon points='48,0 52,0 100,100 0,100' fill='url(%23g)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .cer-beam.l{left:calc(50% - 15vmax - 26vw);transform:rotate(-17deg)}
 .cer-beam.r{left:calc(50% - 15vmax + 26vw);transform:rotate(17deg)}
 .cer-beam.c{left:calc(50% - 13vmax);width:26vmax}
@@ -462,11 +463,11 @@ input[type=range]{accent-color:var(--brass);width:100%}
 /* palco: estátua (ou retrato) sobre o pedestal */
 .cer-stage{--h:min(48vh,520px);position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;margin-top:calc(var(--h) * -.13)}
 .cer.frame .cer-stage{--h:min(38vh,430px);margin-top:clamp(14px,2.6vh,26px)}
-.cer-aura{position:absolute;left:50%;top:44%;width:min(130vw,900px);aspect-ratio:1;translate:-50% -50%;border-radius:50%;opacity:0;pointer-events:none;mix-blend-mode:screen;
+.cer-aura{position:absolute;left:50%;top:44%;width:min(130vw,900px);aspect-ratio:1;translate:-50% -50%;border-radius:50%;opacity:0;pointer-events:none;will-change:opacity,transform;
   background:radial-gradient(closest-side,rgb(255 196 90 / .5),rgb(255 170 60 / .16) 45%,transparent 72%)}
 .cer.s5 .cer-aura{opacity:.85;transition:opacity 1.4s;animation:auraB 3.4s ease-in-out infinite alternate}
 @keyframes auraB{from{transform:scale(.94)}to{transform:scale(1.06)}}
-.cer-mon{position:relative;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(64vh)}
+.cer-mon{position:relative;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(64vh);will-change:transform}
 .cer.s3 .cer-mon{opacity:1;transform:none;transition:transform 1.35s cubic-bezier(.16,1,.3,1),opacity .2s}
 .cer-fig{--ar:.777;position:relative;z-index:1;height:var(--h);width:calc(var(--h) * var(--ar));margin-bottom:calc(var(--h) * -.07)}
 .cer-fig.frm{--ar:.714;margin-bottom:-2px}
@@ -484,12 +485,13 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer-fig .g1,.cer-fig .g2{opacity:0;pointer-events:none}
 /* brilho contido (sem estourar o verde do canal), puxado pro laranja: ouro quente, não neon */
 .cer-fig .g1{filter:blur(6px) brightness(1.25) saturate(1.25) hue-rotate(-6deg)}
-.cer-fig .g2{filter:blur(28px) brightness(1.3) saturate(1.5) hue-rotate(-10deg);transform:scale(1.07);transform-origin:50% 75%}
+.cer-fig .g2{filter:blur(28px) brightness(1.3) saturate(1.5) hue-rotate(-10deg);transform:scale(1.07);transform-origin:50% 75%;will-change:opacity,transform}
 .cer.s5 .cer-fig .g1{opacity:.6;transition:opacity 1.2s}
 .cer.s5 .cer-fig .g2{animation:aura 3.4s ease-in-out .4s infinite alternate both}
 @keyframes aura{from{opacity:.55;transform:scale(1.05)}to{opacity:.95;transform:scale(1.12)}}
-.cer-ped{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;width:min(94vw,calc(var(--h) * 1.02),500px);height:clamp(58px,8.6vh,80px);
-  background:linear-gradient(180deg,#22352e 0%,#101d18 38%,#060c0a 100%);clip-path:polygon(3.5% 0,96.5% 0,100% 100%,0 100%)}
+.cer-ped{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;width:min(94vw,calc(var(--h) * 1.02),500px);height:clamp(58px,8.6vh,80px);overflow:hidden;
+  /* trapézio desenhado num SVG de fundo, não com clip-path: clip-path em celular vira camada de máscara e pisca */
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2322352e'/%3E%3Cstop offset='.38' stop-color='%23101d18'/%3E%3Cstop offset='1' stop-color='%23060c0a'/%3E%3C/linearGradient%3E%3Cpolygon points='3.5,0 96.5,0 100,100 0,100' fill='url(%23g)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .cer.frame .cer-ped{width:min(94vw,calc(var(--h) * .95),460px)}
 .cer-ped::before{content:"";position:absolute;left:3.5%;right:3.5%;top:0;height:3px;background:linear-gradient(90deg,#6b5222,var(--brass-hi) 50%,#6b5222)}
 .cer-ped::after{content:"";position:absolute;left:9%;right:9%;bottom:9px;height:1px;background:linear-gradient(90deg,transparent,rgb(212 173 98 / .45),transparent)}
@@ -774,7 +776,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='06/11/2026 · 4'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='06/11/2026 · 5'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -2511,7 +2513,6 @@ const cerBedStart=()=>{if(!CER.bed)CER.bed=SFX.hold('aura');};
 const cerBedStop=()=>{if(CER.bed){CER.bed.stop();CER.bed=null;}};
 const cerAt=(ms,fn)=>CER.timers.push(setTimeout(fn,ms));
 const cerAdd=(...c)=>$('cer').classList.add(...c);
-function cerJolt(px){if(reduced())return;$('cer').querySelector('.cer-col').animate([{transform:'none'},{transform:`translate(${-px}px,${px*.5}px)`},{transform:`translate(${px*.7}px,${-px*.4}px)`},{transform:`translate(${-px*.35}px,${px*.2}px)`},{transform:'none'}],{duration:480,easing:'ease-out'});}
 function cerSparks(){
   if(reduced())return;
   const r=$('cerFig').getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height*.45,box=$('cer');
@@ -2564,15 +2565,15 @@ function openCeremony(idx,o={}){
   if(CER.wait)cerAt(CER_T.beats,()=>{if(CER.wait)$('cerTap').hidden=false;});
   else cerAt(CER_T.beats,cerBeats);
 }
-/* Uma batida de coração: som grave, a aura pisca em volta da silhueta, os refletores piscam, a tela pulsa. */
+/* Uma batida de coração: som grave, a aura pisca e cresce em volta da silhueta, os refletores piscam.
+   Nada de transform na coluna (estátua, pedestal, WINNER): escalar ou sacudir esse bloco fazia o pedestal piscar no celular. */
 function cerBeat(k){
   SFX.play('heart',{k});if(CER.bed)CER.bed.beat(k);
   if(reduced())return;
   const c=$('cer'),pk=.2+k*.12,fade=[{opacity:0},{opacity:pk,offset:.18},{opacity:0}];
   const g=c.querySelector('.cer-fig .g2');if(g)g.animate(fade,{duration:640,easing:'ease-out'});
-  c.querySelector('.cer-aura').animate([{opacity:0},{opacity:pk*.8,offset:.18},{opacity:0}],{duration:640,easing:'ease-out'});
+  c.querySelector('.cer-aura').animate([{opacity:0,transform:'scale(.9)'},{opacity:pk*.8,transform:'scale(1.04)',offset:.18},{opacity:0,transform:'scale(1)'}],{duration:640,easing:'ease-out'});
   c.querySelectorAll('.cer-beam').forEach((b,j)=>b.animate([{opacity:0},{opacity:.1+k*.07,offset:.2},{opacity:0}],{duration:520,delay:j*45,easing:'ease-out'}));
-  c.querySelector('.cer-col').animate([{transform:'none'},{transform:'scale(1.01)',offset:.15},{transform:'none'}],{duration:420,easing:'ease-out'});
 }
 function cerBeats(){
   const T=CER_T;cerAdd('s4');
@@ -2584,7 +2585,7 @@ function cerBeats(){
 function cerReveal(){
   cerAdd('s5');
   SFX.play('braam');if(CER.bed)CER.bed.reveal();
-  flash('#ffe9b8',.42,700);cerJolt(7);cerSparks();
+  flash('#ffe9b8',.42,700);cerSparks();
   cerAt(CER_T.name,()=>{cerAdd('s7');SFX.play('slam');});
   cerAt(CER_T.act,()=>cerAdd('s8'));
 }
