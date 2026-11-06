@@ -29,7 +29,7 @@ Quando a partida acaba, o jogo revela o que ficou escondido: quem blefou sem nin
 
 ## Hall da Fama
 
-O Menu mostra só uma placa **SEMANA N**, sem dizer quem ganhou. Deslizando a placa pros lados aparecem as semanas anteriores (a mais recente vem primeiro). Tocando nela começa a **cerimônia** daquela semana, em clima de final: o palco sobe, o campeão aparece no escuro em cima de um pedestal, três batidas de coração, e a luz acende: ele vira ouro com aura, **WINNER** abre atrás dele, cai papel dourado e o nome é gravado no pedestal. Depois vem o **Hall da Fama**, com todos os campeões, fotos e contagem de títulos. Quem está com o nome do campeão atual aparece com uma **coroa** na sala e na mesa.
+O Menu mostra só uma placa **SEMANA N**, sem dizer quem ganhou. Deslizando a placa pros lados aparecem as semanas anteriores (a mais recente vem primeiro). Tocando nela começa a **cerimônia** daquela semana, em clima de final: o palco sobe, o campeão aparece no escuro em cima de um pedestal, três batidas de coração, um instante de silêncio, e a luz acende: ele vira ouro com aura, **WINNER** abre atrás dele, cai papel dourado e o nome é gravado no pedestal. O som é todo grave e escuro (uma cama contínua que cresce com as batidas, 808 saturado, corte seco e o impacto), feito pra aparecer também no alto-falante do celular. Depois vem o **Hall da Fama**, com todos os campeões, fotos e contagem de títulos. Quem está com o nome do campeão atual aparece com uma **coroa** na sala e na mesa.
 
 Link direto para mandar no grupo: `https://vazwinz.github.io/coup-online/?hall`. Ele abre na cerimônia e espera um toque para revelar o campeão (o navegador só libera som depois de um toque).
 

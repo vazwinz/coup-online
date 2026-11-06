@@ -773,7 +773,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='06/11/2026 · 2'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='06/11/2026 · 3'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -882,10 +882,10 @@ const SFX=(()=>{
     const comp=c.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=5;comp.attack.value=.002;comp.release.value=.18;
     const master=c.createGain();master.gain.value=1;
     out.connect(comp);comp.connect(master);master.connect(c.destination);
-    const rev=c.createConvolver();rev.buffer=impulse(c,2.6,3);const rin=c.createGain(),rout=c.createGain();rout.gain.value=.4;rin.connect(rev);rev.connect(rout);rout.connect(out);
+    const rev=c.createConvolver();rev.buffer=impulse(c,2.6,3);const rin=c.createGain(),rout=c.createGain(),rv=.4;rout.gain.value=rv;rin.connect(rev);rev.connect(rout);rout.connect(out);
     const nb=c.createBuffer(1,c.sampleRate*2,c.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
     const curve=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;curve[i]=Math.tanh(x*3);}
-    return {c,out,rin,master,nb,curve};
+    return {c,out,rin,rout,rv,master,nb,curve};
   }
   function env(g,t,a,dur,peak){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dur);}
   function route(B,node,o){let n=node;if(o.pan){const p=B.c.createStereoPanner();p.pan.value=o.pan;n.connect(p);n=p;}n.connect(B.out);if(o.rev){const s=B.c.createGain();s.gain.value=o.rev;n.connect(s);s.connect(B.rin);}}
@@ -895,11 +895,24 @@ const SFX=(()=>{
     const c=B.c,f=c.createBiquadFilter();f.type='lowpass';f.Q.value=o.q||3;
     f.frequency.setValueAtTime(o.f0||200,t);f.frequency.exponentialRampToValueAtTime(o.fp||3000,t+(o.fa||.03));f.frequency.exponentialRampToValueAtTime(o.f1||200,t+o.dur);
     const g=c.createGain();env(g,t,o.a||.01,o.dur,o.g||.15);
-    if(o.drive){const ws=c.createWaveShaper();ws.curve=B.curve;f.connect(ws);ws.connect(g);}else f.connect(g);
+    // drive: true satura de leve. Um número multiplica o sinal antes da saturação (mais perto de onda quadrada) e
+    // passa o resultado num passa-baixa (o.dlp), pra saturação não virar chiado: grave sujo, mas escuro.
+    if(o.drive){const ws=c.createWaveShaper();ws.curve=B.curve;
+      if(o.drive>1){const pg=c.createGain(),lp=c.createBiquadFilter();pg.gain.value=o.drive;lp.type='lowpass';lp.frequency.value=o.dlp||1800;lp.Q.value=0;f.connect(pg);pg.connect(ws);ws.connect(lp);lp.connect(g);}
+      else{f.connect(ws);ws.connect(g);}}
+    else f.connect(g);
     route(B,g,o);
     for(const fr of o.freqs)for(const dt of (o.dets||[-7,7])){const osc=c.createOscillator();osc.type=o.type||'sawtooth';osc.frequency.setValueAtTime(fr,t);if(o.glide)osc.frequency.exponentialRampToValueAtTime(fr*o.glide,t+o.dur);osc.detune.value=dt;osc.connect(f);osc.start(t);osc.stop(t+o.dur+.05);}
   }
   function kick(B,t,o){tone(B,t,{type:'sine',f:o.f||150,f2:o.f2||40,glide:o.glide||(o.dur||.4)*.6,dur:o.dur||.4,a:.002,g:o.g||.8,rev:o.rev||0});}
+  /* 808 saturado: seno grave empurrado na saturação e depois escurecido num passa-baixa. Alto-falante de celular
+     não toca a fundamental (abaixo de ~150 Hz), mas toca os harmônicos que a saturação cria, então o grave aparece. */
+  function dist(B,t,o){
+    const c=B.c,osc=c.createOscillator(),pg=c.createGain(),ws=c.createWaveShaper(),f=c.createBiquadFilter(),g=c.createGain();
+    osc.type=o.type||'sine';osc.frequency.setValueAtTime(o.f,t);if(o.f2)osc.frequency.exponentialRampToValueAtTime(o.f2,t+(o.glide||o.dur));
+    pg.gain.value=o.drive||3;ws.curve=B.curve;f.type='lowpass';f.frequency.value=o.lp||1000;f.Q.value=.7;
+    env(g,t,o.a||.003,o.dur,o.g||.2);osc.connect(pg);pg.connect(ws);ws.connect(f);f.connect(g);route(B,g,o);osc.start(t);osc.stop(t+o.dur+.05);
+  }
   function metal(B,t,o){const rs=o.ratios||[1,2.76,5.4,8.93];rs.forEach((r,i)=>tone(B,t,{f:o.f*r,dur:o.dur*(o.decay?o.decay[i]:Math.pow(.72,i)),a:.001,g:(o.g||.2)/Math.sqrt(i+1),rev:o.rev||0,pan:o.pan||0}));}
   const L={
     click(B,t){tone(B,t,{f:1500,f2:900,dur:.05,g:.07});noise(B,t,{ft:'highpass',f:5000,dur:.02,g:.04});},
@@ -930,18 +943,72 @@ const SFX=(()=>{
     pop(B,t){tone(B,t,{f:620,f2:920,glide:.05,dur:.08,g:.09});},
     impact(B,t){kick(B,t,{f:160,f2:34,dur:1.1,g:1,glide:.5});noise(B,t,{ft:'lowpass',f:1600,f2:110,dur:.8,a:.004,g:.7,rev:.5});metal(B,t,{f:150,ratios:[1,1.5,2.14,3.1,4.6],decay:[1,.8,.62,.48,.32],dur:1.4,g:.34,rev:.5});noise(B,t,{ft:'highpass',f:2200,dur:.1,g:.4});},
     join(B,t){tone(B,t,{type:'triangle',f:523.25,dur:.25,g:.12,rev:.3});tone(B,t+.09,{type:'triangle',f:783.99,dur:.4,g:.12,rev:.3});},
-    // Cerimônia do campeão: subida grave, toque metálico, monumento subindo e assentando, coração,
-    // BRAAM de cinema na revelação, brilho no alto e a batida seca do nome sendo gravado
-    swell(B,t){noise(B,t,{ft:'lowpass',f:90,f2:600,dur:1.1,a:.8,g:.32,rev:.3});tone(B,t,{f:41.2,f2:55,dur:1.2,a:.9,g:.35});},
-    ting(B,t){metal(B,t,{f:1318.5,ratios:[1,2.01,3.03,4.2],dur:1.8,g:.06,rev:.6});tone(B,t,{f:659.25,dur:1.2,g:.04,rev:.6});},
-    rumble(B,t){noise(B,t,{ft:'lowpass',f:70,f2:220,dur:1.3,a:.5,g:.5,rev:.2});kick(B,t+1.25,{f:95,f2:38,dur:.5,g:.75});noise(B,t+1.25,{ft:'lowpass',f:500,dur:.2,g:.25,rev:.4});},
-    heart(B,t){kick(B,t,{f:78,f2:42,dur:.26,g:.95});kick(B,t+.17,{f:66,f2:38,dur:.24,g:.62});},
-    braam(B,t){kick(B,t,{f:110,f2:28,dur:1.6,g:1,glide:.6});noise(B,t,{ft:'lowpass',f:1600,f2:80,dur:1.2,a:.004,g:.6,rev:.6});
-      synth(B,t,{freqs:[65.41,98,130.81],dur:3.2,a:.03,f0:160,fp:2300,fa:.22,f1:260,q:2.5,g:.22,rev:.65,drive:true,dets:[-9,0,9]});
-      synth(B,t,{freqs:[32.7],dur:2.6,a:.02,f0:90,fp:420,fa:.2,f1:70,q:1,g:.25,drive:true,dets:[0]});},
-    shimmer(B,t){[1567.98,2093,2349.32,3135.96].forEach((f,i)=>tone(B,t+i*.09,{f,dur:2.6,a:.35,g:.028,rev:.75,pan:i%2?.3:-.3}));},
-    thud(B,t){kick(B,t,{f:150,f2:52,dur:.34,g:.55});noise(B,t,{ft:'lowpass',f:900,dur:.09,g:.25,rev:.35});metal(B,t,{f:220,ratios:[1,2.4,3.9],dur:.9,g:.06,rev:.5});}
+    // Cerimônia do campeão, no clima "aura": grave, seco e escuro, sem sininho nem brilho agudo.
+    // Alto-falante de celular não toca subgrave, então todo grave vem com saturação ou com uma camada no médio-grave.
+    // sopro escuro subindo junto com a tela, como um estrondo tocado ao contrário; corta quando ela chega
+    swell(B,t){noise(B,t,{f:160,f2:1100,q:.8,dur:1.02,a:.9,g:.26,rev:.3});
+      synth(B,t,{freqs:[36.71,73.42],glide:1.5,dur:1.04,a:.92,f0:110,fp:900,fa:.92,f1:500,q:2.5,g:.08,drive:2,dets:[-8,8],rev:.25});
+      synth(B,t,{type:'sine',freqs:[41.2],glide:1.33,dur:1.25,a:1,f0:2000,fp:2000,f1:2000,q:.5,g:.1,drive:true,dets:[0]});},
+    // o nome da liga aparece: uma trompa grave (Ré e Lá) que cresce e some, sobre uma batida abafada
+    hum(B,t){synth(B,t,{freqs:[73.42,110],dur:1.8,a:.35,f0:140,fp:620,fa:.4,f1:150,q:1.5,g:.1,drive:1.6,dets:[-6,6],rev:.45});
+      dist(B,t,{f:70,f2:55,glide:.2,dur:1.2,a:.01,drive:2,lp:500,g:.12,rev:.3});noise(B,t,{ft:'lowpass',f:500,dur:.3,a:.006,g:.16,rev:.5});},
+    // o monumento sobe: terremoto, pedra arrastando e um rosnado grave, forte no começo e assentando junto com o movimento
+    rumble(B,t){noise(B,t,{ft:'lowpass',f:90,f2:240,dur:1.6,a:.15,g:.35,rev:.2});noise(B,t,{f:420,f2:240,q:1.3,dur:1.5,a:.18,g:.22,rev:.3});
+      synth(B,t,{freqs:[36.71,55],glide:1.06,dur:1.6,a:.22,f0:120,fp:520,fa:.35,f1:110,q:2.5,g:.13,drive:2.2,rev:.3});},
+    // batida de coração em 808 saturado (tum-tum); o.k = 0, 1, 2 vai ficando mais forte
+    heart(B,t,o){const v=1+((o&&o.k)||0)*.15;
+      const hit=(tt,g)=>{dist(B,tt,{f:120,f2:73.42,glide:.05,dur:.36,drive:5,lp:900,g:g*v});kick(B,tt,{f:110,f2:42,dur:.24,g:g*.5*v});
+        tone(B,tt,{f:200,f2:110,glide:.05,dur:.1,g:g*.8*v});noise(B,tt,{ft:'lowpass',f:1100,dur:.03,g:g*.6*v});};
+      hit(t,.34);hit(t+.18,.24);},
+    // tensão subindo uma oitava que corta seco: o silêncio antes do impacto (o.len = segundos até o corte)
+    tension(B,t,o){const d=(o&&o.len)||.96;noise(B,t,{f:300,f2:1800,q:1.1,dur:d,a:d-.02,g:.26,rev:.15});
+      synth(B,t,{freqs:[73.42,110],glide:2,dur:d,a:d-.03,f0:200,fp:300,fa:.2,f1:1600,q:4,g:.1,dets:[-12,12]});},
+    // a revelação: estalo, soco no peito, 808 saturado descendo e a parede de metais graves em Ré (o BRAAAM)
+    braam(B,t){noise(B,t,{ft:'lowpass',f:2600,dur:.06,g:.5});kick(B,t,{f:150,f2:38,dur:.6,g:.4});
+      dist(B,t,{f:146.83,f2:73.42,glide:.12,dur:2.6,drive:5,lp:1200,g:.3,rev:.25});
+      synth(B,t,{freqs:[36.71,55,73.42],dur:3.6,a:.02,f0:160,fp:1600,fa:.18,f1:260,q:2,g:.2,drive:1.5,dets:[-10,0,10],rev:.55});
+      synth(B,t,{freqs:[110,146.83,220],dur:2.4,a:.02,f0:300,fp:2000,fa:.15,f1:450,q:1.5,g:.09,dets:[-8,8],rev:.6});
+      noise(B,t,{ft:'lowpass',f:1200,f2:60,dur:1.6,a:.004,g:.4,rev:.6});},
+    // o nome batendo no pedestal: seco, sem metal
+    slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});}
   };
+  /* Sons contínuos, controlados por quem chamou. aura: a cama da cerimônia. Um drone grave em Ré (serra saturada,
+     filtro respirando e sub) que cresce a cada batida, some num corte seco antes do impacto (junto com o eco, pra
+     ser silêncio de verdade) e volta com um coro escuro. Depois assenta baixinho e some sozinha em meio minuto. */
+  const HOLD={
+    aura(B,t0){
+      const c=B.c,out=c.createGain(),oscs=[];out.gain.value=1;route(B,out,{rev:.3});
+      const f=c.createBiquadFilter();f.type='lowpass';f.Q.value=5;f.frequency.setValueAtTime(95,t0);
+      const ws=c.createWaveShaper();ws.curve=B.curve;
+      const dk=c.createBiquadFilter();dk.type='lowpass';dk.frequency.value=1300;dk.Q.value=.6; // escurece a saturação
+      const gD=c.createGain();gD.gain.setValueAtTime(.0001,t0);gD.gain.exponentialRampToValueAtTime(.04,t0+2.6);
+      f.connect(ws);ws.connect(dk);dk.connect(gD);gD.connect(out);
+      for(const fr of [36.71,55,73.42])for(const dt of [-6,6]){const o=c.createOscillator();o.type='sawtooth';o.frequency.value=fr;o.detune.value=dt;o.connect(f);o.start(t0);oscs.push(o);}
+      const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=.12;lg.gain.value=22;lfo.connect(lg);lg.connect(f.frequency);lfo.start(t0);oscs.push(lfo);
+      const sub=c.createOscillator(),gS=c.createGain();sub.frequency.value=36.71;gS.gain.setValueAtTime(.0001,t0);gS.gain.exponentialRampToValueAtTime(.05,t0+2.6);sub.connect(gS);gS.connect(out);sub.start(t0);oscs.push(sub);
+      // coro escuro (Ré menor com sétima), com formantes de "ah" e vibrato; só entra na revelação
+      const gC=c.createGain();gC.gain.value=.0001;gC.connect(out);
+      const fa=c.createBiquadFilter(),fb=c.createBiquadFilter();fa.type=fb.type='bandpass';fa.frequency.value=520;fb.frequency.value=900;fa.Q.value=fb.Q.value=7;fa.connect(gC);fb.connect(gC);
+      const vib=c.createOscillator(),vg=c.createGain();vib.frequency.value=4.6;vg.gain.value=7;vib.connect(vg);vib.start(t0);oscs.push(vib);
+      for(const fr of [146.83,174.61,220,261.63])for(const dt of [-9,9]){const o=c.createOscillator();o.type='sawtooth';o.frequency.value=fr;o.detune.value=dt;vg.connect(o.detune);o.connect(fa);o.connect(fb);o.start(t0);oscs.push(o);}
+      // nada antes de t0: cancelar ali apagaria o começo da cama (e o ganho padrão, 1, viraria um estouro)
+      const now=at=>Math.max(at??c.currentTime,t0+.002),R=B.rout.gain;
+      const set=(p,v,n,tc)=>{p.cancelScheduledValues(n);p.setTargetAtTime(v,n,tc);};
+      return {
+        beat(k,at){const n=now(at);set(f.frequency,110+k*60,n,.08);set(gD.gain,.045+k*.015,n,.15);set(gS.gain,.055+k*.01,n,.15);},
+        // o eco (reverb) é de todos os sons; ele volta no reveal() ou no stop()
+        drop(at){const n=now(at);set(out.gain,.0001,n,.015);set(R,.0001,n,.015);},
+        reveal(at){const n=now(at)+.01;set(R,B.rv,n,.006);set(out.gain,1,n,.04);
+          f.frequency.cancelScheduledValues(n);f.frequency.setValueAtTime(700,n);f.frequency.setTargetAtTime(240,n+.1,.8);f.frequency.setTargetAtTime(170,n+4,2.5);
+          set(gD.gain,.05,n,.3);gD.gain.setTargetAtTime(.028,n+4,2.5);
+          set(gS.gain,.06,n,.3);gS.gain.setTargetAtTime(.035,n+4,2.5);
+          set(gC.gain,.04,n+.3,.9);gC.gain.setTargetAtTime(.022,n+4,2.5);
+          out.gain.setTargetAtTime(.0001,n+26,1.6);oscs.forEach(o=>{try{o.stop(n+36);}catch(e){}});},
+        stop(at){const n=now(at);set(R,B.rv,n,.05);set(out.gain,.0001,n,.18);oscs.forEach(o=>{try{o.stop(n+1.4);}catch(e){}});}
+      };
+    }
+  };
+  function hold(name){if(!ctx||muted||!HOLD[name])return null;try{return HOLD[name](B,ctx.currentTime+.012);}catch(e){return null;}}
   function applyVol(){if(B)B.master.gain.setTargetAtTime(muted?0:vol*vol,ctx.currentTime,.02);}
   function unlock(){
     if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;try{ctx=new AC();B=makeBus(ctx);applyVol();}catch(e){ctx=null;return;}}
@@ -952,9 +1019,9 @@ const SFX=(()=>{
     const delay=o.delay||0,now=performance.now();
     if(!delay&&last[name]&&now-last[name]<35)return;
     if(!delay)last[name]=now;
-    try{L[name](B,ctx.currentTime+.012+delay);}catch(e){}
+    try{L[name](B,ctx.currentTime+.012+delay,o);}catch(e){}
   }
-  return {unlock,play,setVol(v){vol=v;LS.set('coup-vol',v);applyVol();},get vol(){return vol;},toggle(){muted=!muted;LS.set('coup-mute',muted?'1':'0');applyVol();return muted;},get muted(){return muted;},_L:L,_makeBus:makeBus};
+  return {unlock,play,hold,setVol(v){vol=v;LS.set('coup-vol',v);applyVol();},get vol(){return vol;},toggle(){muted=!muted;LS.set('coup-mute',muted?'1':'0');applyVol();return muted;},get muted(){return muted;},_L:L,_H:HOLD,_makeBus:makeBus,get _B(){return B;}};
 })();
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>SFX.unlock(),{capture:true}));
 
@@ -2434,7 +2501,13 @@ async function shareHall(idx){
    três batidas de coração, a luz acende o ouro com aura, WINNER abre atrás dele, chuva dourada, o nome é gravado.
    Toque durante a cerimônia pula pro final. Pelo link ?hall ela espera um toque para começar as batidas:
    o navegador só libera som depois de um toque, e a revelação sem som perde a graça. */
-const CER={timers:[],idx:0,from:'',wait:false,dust:false};
+const CER={timers:[],idx:0,from:'',wait:false,dust:false,bed:null};
+/* Linha do tempo (ms). As batidas contam a partir de beats; o corte, a revelação e a tensão, a partir da primeira batida;
+   o nome e os botões, a partir da revelação. */
+const CER_T={s2:950,s3:1450,beats:2900,beat:[0,640,1180],tension:520,drop:1480,reveal:1700,name:1150,act:2150};
+/* A cama de som grave que segura a cerimônia inteira (ver SFX.hold('aura')). */
+const cerBedStart=()=>{if(!CER.bed)CER.bed=SFX.hold('aura');};
+const cerBedStop=()=>{if(CER.bed){CER.bed.stop();CER.bed=null;}};
 const cerAt=(ms,fn)=>CER.timers.push(setTimeout(fn,ms));
 const cerAdd=(...c)=>$('cer').classList.add(...c);
 function cerJolt(px){if(reduced())return;$('cer').querySelector('.cer-col').animate([{transform:'none'},{transform:`translate(${-px}px,${px*.5}px)`},{transform:`translate(${px*.7}px,${-px*.4}px)`},{transform:`translate(${-px*.35}px,${px*.2}px)`},{transform:'none'}],{duration:480,easing:'ease-out'});}
@@ -2488,7 +2561,7 @@ function cerFigure(e){
 function openCeremony(idx,o={}){
   const L=HALL.list;if(!L.length)return;
   const i=clamp(idx|0,0,L.length-1),e=L[i],c=$('cer');
-  CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();
+  CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();cerBedStop();
   c.querySelectorAll('.cer-spark,.cer-rain').forEach(x=>x.remove());
   $('cerLiga').textContent=HALL.liga;
   $('cerWk').textContent=weekLabel(e).toUpperCase();
@@ -2502,15 +2575,15 @@ function openCeremony(idx,o={}){
   c.className='cer'+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
   try{c.focus({preventScroll:true});}catch(err){}
   if(reduced()){cerAdd('up','s2','s3','s5','s7','s8','fin');return;}
-  requestAnimationFrame(()=>{cerAdd('up');SFX.play('swell');});
-  cerAt(950,()=>{cerAdd('s2');SFX.play('ting');});
-  cerAt(1450,()=>{cerAdd('s3');SFX.play('rumble');});
-  if(CER.wait)cerAt(2900,()=>{if(CER.wait)$('cerTap').hidden=false;});
-  else cerAt(2900,cerBeats);
+  requestAnimationFrame(()=>{cerAdd('up');SFX.play('swell');cerBedStart();});
+  cerAt(CER_T.s2,()=>{cerAdd('s2');SFX.play('hum');});
+  cerAt(CER_T.s3,()=>{cerAdd('s3');SFX.play('rumble');});
+  if(CER.wait)cerAt(CER_T.beats,()=>{if(CER.wait)$('cerTap').hidden=false;});
+  else cerAt(CER_T.beats,cerBeats);
 }
 /* Uma batida de coração: som grave, a aura pisca em volta da silhueta, os refletores piscam, a tela pulsa. */
 function cerBeat(k){
-  SFX.play('heart');
+  SFX.play('heart',{k});if(CER.bed)CER.bed.beat(k);
   if(reduced())return;
   const c=$('cer'),pk=.2+k*.12,fade=[{opacity:0},{opacity:pk,offset:.18},{opacity:0}];
   const g=c.querySelector('.cer-fig .g2');if(g)g.animate(fade,{duration:640,easing:'ease-out'});
@@ -2519,18 +2592,19 @@ function cerBeat(k){
   c.querySelector('.cer-col').animate([{transform:'none'},{transform:'scale(1.01)',offset:.15},{transform:'none'}],{duration:420,easing:'ease-out'});
 }
 function cerBeats(){
-  cerAdd('s4');cerBeat(0);
-  cerAt(640,()=>cerBeat(1));
-  cerAt(1180,()=>cerBeat(2));
-  cerAt(1700,cerReveal);
+  const T=CER_T;cerAdd('s4');
+  T.beat.forEach((ms,k)=>ms?cerAt(ms,()=>cerBeat(k)):cerBeat(k));
+  cerAt(T.tension,()=>SFX.play('tension',{len:(T.drop-T.tension)/1000}));
+  cerAt(T.drop,()=>{if(CER.bed)CER.bed.drop();}); // corte seco: um instante de silêncio antes do impacto
+  cerAt(T.reveal,cerReveal);
 }
 function cerReveal(){
   cerAdd('s5');
-  SFX.play('braam');SFX.play('shimmer',{delay:.45});
+  SFX.play('braam');if(CER.bed)CER.bed.reveal();
   flash('#ffe9b8',.42,700);cerJolt(7);cerSparks();
   cerAt(250,cerRain);
-  cerAt(1150,()=>{cerAdd('s7');SFX.play('thud');});
-  cerAt(2150,()=>cerAdd('s8'));
+  cerAt(CER_T.name,()=>{cerAdd('s7');SFX.play('slam');});
+  cerAt(CER_T.act,()=>cerAdd('s8'));
 }
 /* Pula para o fim. Se ainda não tinha revelado, a revelação acontece na hora (com som e chuva dourada). */
 function cerFinish(){
@@ -2538,18 +2612,18 @@ function cerFinish(){
   const revealed=c.classList.contains('s5');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;$('cerTap').hidden=true;
   cerAdd('fin','up','s2','s3','s5','s7','s8');
-  if(!revealed&&!reduced()){SFX.play('braam');SFX.play('shimmer',{delay:.3});flash('#ffe9b8',.36,600);cerRain();}
+  if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);cerRain();}
 }
 function closeCeremony(then){
   const c=$('cer');if(c.hidden)return;
-  CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;
+  CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();
   const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark,.cer-rain').forEach(x=>x.remove());if(then)then();};
   if(reduced())return done();
   cerAdd('out');setTimeout(done,420);
 }
 $('cer').addEventListener('click',ev=>{
   if(ev.target.closest('button'))return;
-  if(CER.wait){CER.wait=false;$('cerTap').hidden=true;SFX.unlock();cerBeats();return;}
+  if(CER.wait){CER.wait=false;$('cerTap').hidden=true;SFX.unlock();cerBedStart();cerBeats();return;}
   cerFinish();
 });
 $('cerX').onclick=()=>closeCeremony();
