@@ -313,6 +313,72 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .end .hands{gap:12px 20px}
 .end .hands .card.md{width:62px;font-size:9px;border-radius:7px}
 .end .hands .seat-cards{gap:5px}
+
+/* ===== Hall da Fama ===== */
+/* Faixa do campeão atual no Menu: a primeira coisa que todo mundo vê ao abrir o jogo */
+.champ{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border-radius:12px;text-align:left;
+  border:1px solid var(--brass-dim);background:linear-gradient(100deg,rgb(212 173 98 / .2),rgb(212 173 98 / .05) 60%,transparent);
+  transition:border-color .2s,box-shadow .2s,transform .14s cubic-bezier(.2,.8,.2,1);animation:textIn .45s cubic-bezier(.2,.8,.2,1)}
+.champ:hover{border-color:var(--brass);box-shadow:0 8px 22px rgb(0 0 0 / .3)}
+.champ:active{transform:scale(.985)}
+.champ .ph{display:block;width:46px;height:46px;flex:none;border-radius:50%;overflow:hidden;font-size:18px;border:2px solid var(--brass);box-shadow:0 0 0 3px rgb(212 173 98 / .18);background:#241e12}
+.champ .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.champ .tx{display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden}
+.champ small{font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:419px){.champ .gl{display:none}}
+.champ b{font:700 1.45rem/1.05 var(--display);letter-spacing:.05em;color:var(--brass-hi);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.champ .go{margin-left:auto;display:flex;align-items:center;gap:1px;font-size:.78rem;color:var(--brass);white-space:nowrap}
+.champ .go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.champ .av{position:relative;flex:none}
+.champ .badge{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);padding:1px 5px;border-radius:99px;background:var(--brass);color:#1d1708;
+  font-size:.56rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.3;box-shadow:0 0 0 2px var(--felt-2)}
+.champ.fresh{border-color:var(--brass)}
+.champ.fresh::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgb(255 240 200 / .22) 50%,transparent 70%);
+  transform:translateX(-100%);animation:shine 2.8s 1s ease-in-out infinite}
+/* Sem foto: monograma no padrão do verso das cartas */
+.mono{display:grid;place-items:center;width:100%;height:100%;font:700 1.6em/1 var(--display);color:var(--brass);
+  background:radial-gradient(circle at 50% 42%,rgb(212 173 98 / .18),transparent 62%),repeating-linear-gradient(45deg,#2b2416 0 6px,#241e12 6px 12px)}
+/* Tela */
+.sheet.hall{max-width:560px;align-items:center;text-align:center;gap:16px}
+.hall-h{display:flex;flex-direction:column;gap:2px;align-items:center}
+.hall-h .kick{font-size:.7rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted)}
+.hall-h h2{font-size:2.15rem}
+/* O campeão vira uma carta do jogo: moldura de latão, coroa e placa com o nome */
+.trophy{position:relative;width:min(240px,62vw);margin:28px 0 0;isolation:isolate}
+.trophy::before{content:"";position:absolute;inset:-16% -32%;z-index:-1;pointer-events:none;background:radial-gradient(closest-side,rgb(212 173 98 / .3),transparent)}
+.trophy .crown{position:absolute;left:50%;top:-36px;width:72px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 6px 10px rgb(0 0 0 / .55))}
+.trophy .pc{position:relative;aspect-ratio:5/7;border-radius:14px;overflow:hidden;font-size:64px;border:2px solid var(--brass);background:#241e12;
+  box-shadow:0 0 0 5px var(--felt-2),0 0 0 6px var(--brass-dim),0 26px 60px rgb(0 0 0 / .6)}
+.trophy .pc img{width:100%;height:100%;object-fit:cover;display:block}
+.trophy .pc::before{content:"";position:absolute;inset:7px;z-index:2;pointer-events:none;border:1px solid rgb(239 205 134 / .5);border-radius:9px}
+.trophy .pc::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgb(255 240 200 / .3) 50%,transparent 65%);
+  transform:translateX(-130%);animation:shine 1.5s .45s ease-out both}
+@keyframes shine{to{transform:translateX(130%)}}
+.trophy .plate{position:absolute;left:0;right:0;bottom:0;z-index:1;display:flex;flex-direction:column;gap:3px;align-items:center;padding:64px 14px 17px;
+  background:linear-gradient(to top,rgb(8 14 11 / .95) 22%,rgb(8 14 11 / 0))}
+.trophy .plate .t{font-size:.66rem;text-transform:uppercase;letter-spacing:.16em;color:var(--brass)}
+.trophy .plate .nm{max-width:100%;font:700 2rem/1 var(--display);letter-spacing:.05em;color:var(--brass-hi);text-shadow:0 2px 10px rgb(0 0 0 / .6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trophy.swap{animation:swapIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes swapIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
+.hall-meta{display:flex;flex-direction:column;gap:5px;align-items:center}
+.hall-meta .wk{font-weight:600;font-variant-numeric:tabular-nums}
+.hall-meta .q{max-width:34ch;font-style:italic;color:var(--muted);text-wrap:pretty}
+.hall-sec{align-self:stretch;display:flex;flex-direction:column;gap:10px}
+.hof{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px 10px}
+.hof button{display:flex;flex-direction:column;gap:5px;align-items:center;min-width:0;padding:0;border:0;background:none}
+.hof .pc{width:100%;aspect-ratio:5/7;border-radius:9px;overflow:hidden;font-size:30px;border:1px solid var(--brass-dim);background:#241e12;box-shadow:0 6px 14px rgb(0 0 0 / .4);
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s}
+.hof .pc img{width:100%;height:100%;object-fit:cover;display:block}
+.hof button:hover .pc{transform:translateY(-3px);border-color:var(--brass)}
+.hof button[aria-pressed="true"] .pc{border-color:var(--brass-hi);box-shadow:0 0 0 2px var(--brass),0 10px 22px rgb(212 173 98 / .22)}
+.hof .n{max-width:100%;font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hof .d{margin-top:-4px;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.hall-foot{position:sticky;bottom:-20px;align-self:stretch;margin:0 -20px -20px;padding:16px 20px 20px;display:flex;justify-content:center;gap:8px;
+  background:linear-gradient(180deg,rgb(17 38 31 / 0),var(--felt) 34%)}
+/* Coroa ao lado do nome do campeão atual, na sala e na mesa */
+.champ-n::before{content:"";display:inline-block;width:1.05em;height:.8em;margin-right:.28em;vertical-align:-.03em;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48'%3E%3Cpath d='M8 38 4 14l16 12L32 8l12 18 16-12-4 24z' fill='%23efcd86'/%3E%3Crect x='7' y='37' width='50' height='9' rx='2' fill='%23d4ad62'/%3E%3C/svg%3E") center/contain no-repeat}
+@media (prefers-reduced-motion:reduce){.trophy .pc::after,.champ.fresh::after{display:none}.trophy.swap,.champ{animation:none}}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px}
 .slot{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.85rem}
 .slot label{cursor:pointer;color:var(--brass);text-decoration:underline;text-underline-offset:3px}
@@ -411,6 +477,11 @@ input[type=range]{accent-color:var(--brass);width:100%}
   <div class="sheet menu">
     <p class="logo">Coup</p>
     <p class="sub">Blefe, dedução e golpe de estado</p>
+    <button class="champ" id="champBtn" type="button" hidden>
+      <span class="av"><span class="ph" id="champPh"></span><span class="badge" id="champNew" hidden>Novo</span></span>
+      <span class="tx"><small>Campeão da semana</small><b id="champNm"></b></span>
+      <span class="go"><span class="gl">Hall da Fama</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+    </button>
     <div class="tabs" id="tabs" data-tab="solo" role="tablist">
       <span class="ind"></span>
       <button role="tab" id="tabSoloBtn" aria-selected="true" aria-controls="tabSolo">Contra bots</button>
@@ -497,6 +568,10 @@ input[type=range]{accent-color:var(--brass);width:100%}
     <p><b>Online:</b> cada um vê só as próprias cartas; o host confere todas as jogadas. Na sua vez você tem 30 s no total para escolher ação, alvo e, no Mentalista, a carta; voltar não zera o tempo. Para contestar ou bloquear são 15 s. Se o tempo acabar, você passa (ou um bot joga por você). Se alguém cair, um bot assume até a pessoa voltar pelo mesmo navegador.</p>
     <div class="row"><button class="btn gold" id="closeRules">Fechar</button></div>
   </div>
+</div>
+
+<div class="overlay" id="hallOv" hidden>
+  <div class="sheet hall" id="hallBox" role="dialog" aria-labelledby="hallTitle"></div>
 </div>
 
 <script>
@@ -754,7 +829,7 @@ function idleStatus(){
 function makeSeat(p){
   const root=document.createElement('div');root.className='seat';
   root.innerHTML='<div class="clk"></div><div class="seat-h"><span class="pn"></span><span class="coins"></span></div><div class="seat-tag"></div><div class="seat-cards"></div>';
-  root.querySelector('.pn').textContent=p.name;root.querySelector('.pn').title=p.name;
+  const pn=root.querySelector('.pn');pn.textContent=p.name;pn.title=p.name;pn.dataset.pname=p.bot?'':p.name;
   const box=root.querySelector('.seat-cards'),cards=[makeC3('sm'),makeC3('sm')];cards.forEach(c=>box.appendChild(c));
   return {root,coins:root.querySelector('.coins'),tag:root.querySelector('.seat-tag'),cardsBox:box,cards};
 }
@@ -768,7 +843,7 @@ function buildTable(v){
   const meEl=$('me');
   if(mi>=0){
     const p=v.players[mi];meEl.hidden=false;meEl.className='me';
-    $('meName').textContent=v.online?p.name:'Você';
+    $('meName').textContent=v.online?p.name:'Você';$('meName').dataset.pname=v.online?p.name:'';
     const cards=[makeC3('lg'),makeC3('lg')];cards.forEach(c=>$('hand').appendChild(c));
     const mc=$('meCoins');delete mc._v;
     TB.seats.set(p.id,{root:meEl,coins:mc,tag:$('meSt'),cardsBox:$('hand'),cards});
@@ -778,6 +853,7 @@ function buildTable(v){
   if(v.tn>0||reduced())TB.dealt=Promise.resolve();
   else TB.dealt=dealAnim(seq);
   for(const el of seq)el._q=TB.dealt;
+  applyCrowns();
 }
 function dealAnim(cards){
   const p=centerOf($('pile')),gap=T(85),dur=T(520);
@@ -1846,7 +1922,8 @@ function renderLobby(s){
   const rows=[...s.members.map((m,i)=>({k:'m'+m.mid,name:m.name,tag:[m.host?'host':'',(isHost&&m.host)||m.mid===NET.myMid?'você':'',i>=6?'assiste':'',wins(m.name)].filter(Boolean).join(' · ')||'jogador',spec:i>=6,bot:false})),
     ...Array.from({length:s.bots},(_,i)=>({k:'b'+i,name:`Bot ${i+1}`,tag:'bot',bot:true}))];
   rows.forEach(r=>{const li=document.createElement('li');li.dataset.k=r.k;if(prev.has(r.k))li.style.animation='none';if(r.spec)li.classList.add('spec');if(r.bot)li.classList.add('bot');
-    li.innerHTML='<span class="dot"></span><span class="who"></span><span class="role"></span>';li.querySelector('.who').textContent=r.name;li.querySelector('.role').textContent=r.tag;ul.appendChild(li);});
+    li.innerHTML='<span class="dot"></span><span class="who"></span><span class="role"></span>';const who=li.querySelector('.who');who.textContent=r.name;if(!r.bot)who.dataset.pname=r.name;li.querySelector('.role').textContent=r.tag;ul.appendChild(li);});
+  applyCrowns();
   const humans=Math.min(6,s.members.length),total=humans+Math.min(s.bots,6-humans);
   $('lbTotal').textContent=`${total} de 6 lugares na mesa · ${MODES[s.mode]||''} · ${SPEEDS[s.speed]||''}`+(sc?` · ${sc.games} ${sc.games===1?'partida jogada':'partidas jogadas'}`:'');
   $('lbHost').hidden=!isHost;
@@ -1867,7 +1944,7 @@ $('lbBack').onclick=()=>closeOv($('lobbyOv'));
 function quitRoom(silent){NET.lastJoin=null;NET.reconnecting=false;dropSeat();clearUrlSala();leaveRoom(silent);}
 $('lbLeave').onclick=()=>{quitRoom();clearTable();closeOv($('endOv'));openMenu();setMenuMsg('Você saiu da sala.');};
 /* Convite: link que já abre a sala. No celular abre a folha de compartilhar (WhatsApp etc.); sem ela, copia o link. */
-function inviteUrl(code){const base=/^https?:$/.test(location.protocol)?location.origin+location.pathname:CANON;return base+'?sala='+code;}
+function inviteUrl(code){return baseUrl()+'?sala='+code;}
 async function shareInvite(){
   const code=NET.code;if(!code)return;
   const url=inviteUrl(code);
@@ -1921,6 +1998,7 @@ function openMenu(){
   $('roomBtn').hidden=!(NET.role&&(NET.role==='host'||NET.lobbyState));
   setMenuMsg('');
   openOv($('menuOv'));
+  loadHall(false);
 }
 $('menuBtn').onclick=()=>openMenu();
 $('resumeBtn').onclick=()=>closeOv($('menuOv'));
@@ -1974,7 +2052,7 @@ $('imgBtn').onclick=()=>{renderSlots();openOv($('imgOv'));};
 $('closeImg').onclick=()=>closeOv($('imgOv'));
 $('rulesBtn').onclick=()=>openOv($('rulesOv'));
 $('closeRules').onclick=()=>closeOv($('rulesOv'));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const id of ['imgOv','rulesOv'])if(!$(id).hidden)closeOv($(id));}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const id of ['imgOv','rulesOv','hallOv'])if(!$(id).hidden)closeOv($(id));}});
 /* -- Mobile: tela acesa + reconexão ao voltar pro app -- */
 const WAKE=(()=>{let s=null,want=false;
   async function acq(){if(!want||s||document.visibilityState!=='visible'||!('wakeLock'in navigator))return;try{s=await navigator.wakeLock.request('screen');s.addEventListener('release',()=>{s=null;});}catch(e){}}
@@ -1985,6 +2063,157 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('online',resumeCheck);
 window.addEventListener('beforeunload',()=>{if(NET.role==='client')netSend(NET.hostConn,{t:'leave'});else if(NET.role==='host')netBroadcast({t:'bye',msg:'O host saiu.'});try{NET.peer&&NET.peer.destroy();}catch(e){}});
 
+/* ===================== Hall da Fama ===================== */
+/* Campeões da liga semanal. Os dados ficam em hall.json (fácil de editar pelo próprio GitHub) e as fotos na pasta hall/.
+   Quem decide o campeão é a liga, fora do app: o jogo só mostra o Hall e coroa o campeão atual na sala e na mesa. */
+const HALL={list:[],liga:'Liga de Coup',state:'idle',at:0,sel:0};
+const normN=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+const champKey=e=>e?e.data+'|'+e.keys[0]:'';
+function fmtD(iso){const [y,m,d]=iso.split('-');return `${d}/${m}`+(+y!==new Date().getFullYear()?`/${y}`:'');}
+const weekLabel=e=>e.semana||`Semana de ${fmtD(e.data)}`;
+const nthLabel=n=>n===1?'Primeiro título':`${n}º título`;
+function baseUrl(){return /^https?:$/.test(location.protocol)?location.origin+location.pathname:CANON;}
+const CROWN='<svg class="crown" viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="hallCrownG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c4"/><stop offset=".55" stop-color="#efcd86"/><stop offset="1" stop-color="#b8893a"/></linearGradient></defs>'+
+  '<path d="M8 38 4 14l16 12L32 8l12 18 16-12-4 24z" fill="url(#hallCrownG)" stroke="#6b4f1d" stroke-width="2" stroke-linejoin="round"/>'+
+  '<rect x="7" y="37" width="50" height="9" rx="2" fill="#d4ad62" stroke="#6b4f1d" stroke-width="2"/><circle cx="32" cy="41.5" r="2.2" fill="#8a2f2a"/>'+
+  '<circle cx="4.5" cy="12" r="3.6" fill="#fff3d0" stroke="#6b4f1d" stroke-width="1.6"/><circle cx="32" cy="6" r="3.6" fill="#fff3d0" stroke="#6b4f1d" stroke-width="1.6"/><circle cx="59.5" cy="12" r="3.6" fill="#fff3d0" stroke="#6b4f1d" stroke-width="1.6"/></svg>';
+
+/* Lê e valida o hall.json: entrada sem nome ou data é ignorada; foto só da pasta hall/. */
+function normHall(d){
+  const out=[];
+  for(const x of (d&&Array.isArray(d.campeoes)?d.campeoes:[])){
+    if(!x||typeof x!=='object')continue;
+    const nome=typeof x.nome==='string'?x.nome.replace(/[\u0000-\u001f]/g,'').replace(/\s+/g,' ').trim().slice(0,24):'';
+    const data=typeof x.data==='string'&&/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(x.data)?x.data:'';
+    if(!nome||!data)continue;
+    const foto=typeof x.foto==='string'&&/^hall\/[\w.-]+\.(webp|jpe?g|png|avif)$/i.test(x.foto)?x.foto:null;
+    const pos=typeof x.enquadramento==='string'&&/^\d{1,3}% \d{1,3}%$/.test(x.enquadramento.trim())?x.enquadramento.trim():'50% 30%';
+    const semana=typeof x.semana==='string'?x.semana.replace(/[\u0000-\u001f]/g,'').trim().slice(0,40):'';
+    const frase=typeof x.frase==='string'?x.frase.replace(/[\u0000-\u001f]/g,'').trim().slice(0,120):'';
+    const apel=Array.isArray(x.apelidos)?x.apelidos.filter(a=>typeof a==='string').map(normN).filter(Boolean).slice(0,6):[];
+    out.push({nome,data,foto,pos,semana,frase,keys:[normN(nome),...apel]});
+  }
+  out.sort((a,b)=>b.data.localeCompare(a.data));
+  // Número do título de cada um, em ordem cronológica (o 1º título, o 2º...)
+  const cnt={};for(const e of [...out].reverse()){const k=e.keys[0];cnt[k]=(cnt[k]||0)+1;e.nth=cnt[k];}
+  return out;
+}
+function photoEl(e,lazy){
+  const mono=()=>{const s=document.createElement('span');s.className='mono';s.textContent=((e.nome.match(/[\p{L}\p{N}]/u)||['?'])[0]).toUpperCase();return s;};
+  if(!e.foto)return mono();
+  const im=new Image();im.alt=e.nome;im.decoding='async';if(lazy)im.loading='lazy';
+  im.onerror=()=>im.replaceWith(mono());
+  im.style.objectPosition=e.pos;im.src=e.foto;
+  return im;
+}
+async function loadHall(force){
+  if(HALL.state==='loading')return;
+  if(!force&&HALL.state==='ok'&&Date.now()-HALL.at<5*60e3)return;
+  if(!/^https?:$/.test(location.protocol)){HALL.state='off';return;} // aberto como arquivo: sem Hall
+  const before=JSON.stringify(HALL.list),hadData=HALL.list.length>0;
+  HALL.state='loading';
+  try{
+    // no-cache: confere com o servidor a cada abertura, então campeão novo aparece na hora (sem esperar o cache do GitHub)
+    const r=await fetch('hall.json',{cache:'no-cache'});
+    if(!r.ok)throw new Error('http '+r.status);
+    const d=await r.json();
+    HALL.list=normHall(d);
+    HALL.liga=d&&typeof d.liga==='string'&&d.liga.trim()?d.liga.replace(/[\u0000-\u001f]/g,'').trim().slice(0,40):'Liga de Coup';
+    HALL.state='ok';HALL.at=Date.now();
+  }catch(e){HALL.state=HALL.list.length?'ok':'err';}
+  renderChamp();applyCrowns();
+  if(!$('hallOv').hidden&&(JSON.stringify(HALL.list)!==before||!hadData)){renderHall();if(!hadData&&HALL.list.length){SFX.play('bells');celebrate();}}
+}
+function renderChamp(){
+  const b=$('champBtn'),e=HALL.list[0];
+  b.hidden=!e;if(!e)return;
+  $('champNm').textContent=e.nome;
+  const ph=$('champPh');ph.innerHTML='';ph.appendChild(photoEl(e,false));
+  const fresh=LS.get('coup-hall-seen','')!==champKey(e);
+  $('champNew').hidden=!fresh;b.classList.toggle('fresh',fresh);
+  b.setAttribute('aria-label',`Hall da Fama. Campeão da semana: ${e.nome}`);
+}
+/* Coroa: quem estiver com o nome (ou apelido) do campeão atual. Bots nunca. */
+function isChamp(name){const e=HALL.list[0];return !!(e&&name&&e.keys.includes(normN(name)));}
+function applyCrowns(){document.querySelectorAll('[data-pname]').forEach(el=>el.classList.toggle('champ-n',isChamp(el.dataset.pname)));}
+function renderHall(swap){
+  const box=$('hallBox'),L=HALL.list;box.innerHTML='';
+  const h=document.createElement('header');h.className='hall-h';
+  h.innerHTML=`<span class="kick">${esc(HALL.liga)}</span><h2 id="hallTitle">Hall da Fama</h2>`;box.appendChild(h);
+  if(!L.length){
+    const p=document.createElement('p');p.className='msg';
+    p.textContent=HALL.state==='err'?'Não consegui carregar o Hall da Fama. Confira a internet e tente de novo.':HALL.state==='ok'||HALL.state==='off'?'Ainda não tem campeão registrado.':'Carregando…';
+    box.appendChild(p);
+  }else{
+    const i=clamp(HALL.sel,0,L.length-1),e=L[i];
+    const tr=document.createElement('figure');tr.className='trophy'+(swap&&!reduced()?' swap':'');
+    // A placa fica dentro da carta, para respeitar os cantos arredondados e a moldura
+    tr.innerHTML=CROWN+'<div class="pc"><div class="plate"><span class="t"></span><b class="nm"></b></div></div>';
+    tr.setAttribute('aria-label',`${e.nome}, ${weekLabel(e)}`);
+    tr.querySelector('.pc').prepend(photoEl(e,false));
+    tr.querySelector('.t').textContent=i===0?'Campeão da semana':'Campeão';
+    tr.querySelector('.nm').textContent=e.nome;
+    box.appendChild(tr);
+    const meta=document.createElement('div');meta.className='hall-meta';
+    const wk=document.createElement('span');wk.className='wk';wk.textContent=`${weekLabel(e)} · ${nthLabel(e.nth)}`;meta.appendChild(wk);
+    if(e.frase){const q=document.createElement('p');q.className='q';q.textContent=`“${e.frase}”`;meta.appendChild(q);}
+    box.appendChild(meta);
+    if(L.length>1){
+      const sec=document.createElement('section');sec.className='hall-sec';
+      sec.innerHTML='<span class="lbl">Todas as semanas</span><div class="hof"></div>';
+      const g=sec.querySelector('.hof');
+      L.forEach((x,k)=>{
+        const b=document.createElement('button');b.type='button';
+        b.setAttribute('aria-pressed',String(k===i));b.setAttribute('aria-label',`${x.nome}, ${weekLabel(x)}`);
+        b.innerHTML='<span class="pc"></span><span class="n"></span><span class="d"></span>';
+        b.querySelector('.pc').appendChild(photoEl(x,true));
+        b.querySelector('.n').textContent=x.nome;b.querySelector('.d').textContent=fmtD(x.data);
+        b.onclick=()=>{if(HALL.sel===k)return;HALL.sel=k;SFX.play('flip');renderHall(true);box.scrollTo({top:0,behavior:reduced()?'auto':'smooth'});};
+        g.appendChild(b);
+      });
+      box.appendChild(sec);
+      // Títulos por pessoa (o nome aparece como na conquista mais recente)
+      const t=new Map();for(const x of L){const k=x.keys[0];const r=t.get(k)||{nome:x.nome,n:0};r.n++;t.set(k,r);}
+      const rows=[...t.values()].sort((a,b)=>b.n-a.n),top=rows[0].n;
+      const s2=document.createElement('section');s2.className='hall-sec';
+      s2.innerHTML='<span class="lbl">Títulos</span><div class="chips"></div>';
+      const ch=s2.querySelector('.chips');
+      rows.forEach(r=>{const c=document.createElement('span');c.className='sc-chip'+(top>1&&r.n===top?' top':'');c.textContent=`${r.nome} ${r.n}`;ch.appendChild(c);});
+      box.appendChild(s2);
+    }
+  }
+  const f=document.createElement('div');f.className='hall-foot';
+  const btn=(txt,cls,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn '+cls;b.textContent=txt;b.onclick=fn;f.appendChild(b);};
+  if(L.length)btn('Compartilhar','gold',()=>shareHall());
+  else if(HALL.state==='err')btn('Tentar de novo','gold',()=>{HALL.state='idle';renderHall();loadHall(true);});
+  btn('Fechar','',()=>closeOv($('hallOv')));
+  box.appendChild(f);
+}
+/* Campeão novo (para este aparelho): confete e fanfarra na primeira vez que abre o Hall. */
+function celebrate(){
+  const e=HALL.list[0];if(!e)return;
+  const k=champKey(e);if(LS.get('coup-hall-seen','')===k)return;
+  LS.set('coup-hall-seen',k);renderChamp();
+  setTimeout(()=>{if($('hallOv').hidden)return;confetti();SFX.play('win');},420);
+}
+function openHall(){
+  HALL.sel=0;renderHall();openOv($('hallOv'));
+  if(HALL.list.length){SFX.play('bells');celebrate();}
+  loadHall(false);
+}
+async function shareHall(){
+  const L=HALL.list;if(!L.length)return;
+  const i=clamp(HALL.sel,0,L.length-1),e=L[i],url=baseUrl()+'?hall';
+  const text=i===0?`👑 ${e.nome} é o campeão da semana da ${HALL.liga}.`:`👑 ${e.nome} foi campeão da ${HALL.liga} (${weekLabel(e).toLowerCase()}).`;
+  if(navigator.share){
+    try{await navigator.share({title:'Hall da Fama · Coup',text,url});return;}
+    catch(err){if(err&&err.name==='AbortError')return;}
+  }
+  try{await navigator.clipboard.writeText(`${text} ${url}`);toast('Copiado. Cola no grupo.');}
+  catch(err){toast('Não deu pra copiar. O link é '+url,true);}
+}
+$('champBtn').onclick=()=>openHall();
+
 /* ===================== Início ===================== */
 (function init(){
   $('oppSel').value=LS.get('coup-opp','3');$('modeSel').value=LS.get('coup-mode','classico');$('spdSel').value=LS.get('coup-spd','750');
@@ -1994,9 +2223,11 @@ window.addEventListener('beforeunload',()=>{if(NET.role==='client')netSend(NET.h
   refreshInvite(true);
   $('verTxt').textContent='Versão de '+VERSION;
   refreshArt();idleStatus();updateChrome();openOv($('menuOv'));
+  loadHall(true);
+  if(new URLSearchParams(location.search).has('hall'))openHall(); // link do Hall compartilhado no grupo
   if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
-window.__coup={get G(){return G;},get VIEW(){return VIEW;},NET,SFX,validAnswer};
+window.__coup={get G(){return G;},get VIEW(){return VIEW;},NET,SFX,HALL,validAnswer};
 </script>
 </body>
 </html>

@@ -27,6 +27,23 @@ Instalável como app (PWA): abra o link no navegador e use **Adicionar à tela i
 
 Quando a partida acaba, o jogo revela o que ficou escondido: quem blefou sem ninguém perceber, quem pegou mais blefes, quem contestou a verdade, e os números de cada um. Durante a partida esses dados ficam só com o host; ninguém recebe antes do fim. Também tem **placar da sala** entre as revanches (e da sessão, contra os bots).
 
+## Hall da Fama
+
+O Menu mostra o campeão da semana da liga, e o **Hall da Fama** guarda todos os campeões, com foto e contagem de títulos. Quem está com o nome do campeão atual aparece com uma **coroa** na sala e na mesa. Link direto para mandar no grupo: `https://vazwinz.github.io/coup-online/?hall`
+
+Para registrar o campeão da semana:
+
+1. Coloque a foto na pasta `hall/` (em pé, de preferência já recortada).
+2. Adicione uma entrada em `hall.json`, dentro de `campeoes`:
+
+```json
+{ "nome": "Isaac", "data": "2026-11-02", "foto": "hall/2026-11-02-isaac.webp" }
+```
+
+Campos opcionais: `"frase"` (aparece embaixo da foto), `"semana"` (troca o "Semana de 02/11" por outro texto, tipo "Semana 7"), `"apelidos"` (outros nomes que também ganham a coroa, ex.: `["Zac"]`) e `"enquadramento"` (ex.: `"50% 20%"`, se o rosto ficar cortado). Entrada sem foto aparece com a inicial do nome.
+
+Foto de celular costuma guardar a localização de onde foi tirada; tire esses dados antes de subir. O site atualiza em 1 a 2 minutos, e todo mundo vê o campeão novo na próxima vez que abrir o jogo.
+
 ## Imagens das cartas
 
 As ilustrações padrão são SVG próprios. Você pode subir suas próprias imagens pelo botão **Cartas** — elas ficam salvas **só no seu navegador** (localStorage), nunca neste repositório.
