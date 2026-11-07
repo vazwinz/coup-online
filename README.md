@@ -18,6 +18,8 @@ Quem cria a sala vira o **host** e a partida roda no navegador dele; os outros e
 
 Instalável como app (PWA): abra o link no navegador e use **Adicionar à tela inicial** — abre em tela cheia, sem a barra do navegador. Durante a partida a tela não apaga, e se você sair do app e voltar, o jogo **reconecta sozinho** na mesma sala. O modo contra bots funciona offline depois da primeira abertura.
 
+**Animações:** o jogo obedece o "reduzir movimento" do aparelho. Em computador com os efeitos de animação desligados no Windows (ou "Reduzir movimento" no macOS e no celular), ele abre com as animações reduzidas e avisa no Menu. Em **Menu → Animações** dá pra escolher **Ligadas** ou **Reduzidas**, e a escolha fica salva no aparelho. Na cerimônia reduzida aparece **Ver com animação**.
+
 ## Modos e variantes
 
 - **Clássico** e **Mentalista** (no Golpe você chuta uma carta do alvo).

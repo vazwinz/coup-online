@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Coup</title>
+<script>/* animações: escolha do Menu (coup-anim) ou, sem escolha, o "reduzir movimento" do sistema */
+try{var a=localStorage.getItem('coup-anim');if(a==='off'||(a!=='on'&&matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('rm');}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
 <meta name="theme-color" content="#11261f">
@@ -393,7 +395,8 @@ input[type=range]{accent-color:var(--brass);width:100%}
 /* Coroa ao lado do nome do campeão atual, na sala e na mesa */
 .champ-n::before{content:"";display:inline-block;width:1.05em;height:.8em;margin-right:.28em;vertical-align:-.03em;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48'%3E%3Cpath d='M8 38 4 14l16 12L32 8l12 18 16-12-4 24z' fill='%23efcd86'/%3E%3Crect x='7' y='37' width='50' height='9' rx='2' fill='%23d4ad62'/%3E%3C/svg%3E") center/contain no-repeat}
-@media (prefers-reduced-motion:reduce){.trophy .pc::after,.wk::after{display:none}.trophy.swap,.weeks,.weeks.fresh .wk.newest,.wk.live.upd,.wk.live span::before{animation:none}}
+.rm .trophy .pc::after,.rm .wk::after{display:none}
+.rm .trophy.swap,.rm .weeks,.rm .weeks.fresh .wk.newest,.rm .wk.live.upd,.rm .wk.live span::before{animation:none}
 /* Placar da semana em andamento (lido do placar.txt) */
 .sheet.lb{max-width:480px;text-align:center;gap:18px}
 .lb-h{display:flex;flex-direction:column;gap:5px;align-items:center}
@@ -420,7 +423,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .lb-list .lead .nm{font:700 1.4rem/1.15 var(--display);letter-spacing:.03em;color:var(--brass-hi)}
 .lb-list .lead .pt{font-size:1.3rem;color:var(--brass-hi)}
 .hall-h .linkbtn{margin-top:6px}
-@media (prefers-reduced-motion:reduce){.lb-list li,.lb-st.live::before{animation:none}}
+.rm .lb-list li,.rm .lb-st.live::before{animation:none}
 /* Foto recortada (estátua) nas cartas do Hall: em pé no fundo da carta, com luz dourada atrás */
 .trophy .pc.cut,.hof .pc.cut{background:radial-gradient(ellipse 85% 55% at 50% 42%,rgb(212 160 70 / .3),transparent 70%),radial-gradient(circle at 50% 100%,#2a2010,#0b0905 72%)}
 .trophy .pc.cut img,.hof .pc.cut img{object-fit:contain;object-position:50% 100%!important;filter:drop-shadow(0 0 10px rgb(255 190 80 / .35))}
@@ -593,9 +596,10 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .lb-chat form{display:flex;gap:6px}
 .lb-chat input{flex:1;min-width:0}
 
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
+/* Animações reduzidas: .rm no <html> quando o sistema pede menos movimento (e a pessoa não ligou no Menu) ou quando ela escolheu "Reduzidas" */
+.rm *,.rm *::before,.rm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+.anim-note{margin:-4px 0 0;font-size:.78rem;line-height:1.4;color:var(--muted)}
+.cer-anim{grid-area:2/1;margin-top:10px;opacity:.85}
 </style>
 </head>
 <body>
@@ -675,6 +679,8 @@ input[type=range]{accent-color:var(--brass);width:100%}
     </section>
     <p class="msg" id="menuMsg"></p>
     <label class="field"><span>Volume</span><input type="range" id="volIn" min="0" max="1" step="0.05"></label>
+    <label class="field"><span>Animações</span><select id="animSel"><option value="on">Ligadas</option><option value="off">Reduzidas</option></select></label>
+    <p class="anim-note" id="animNote" hidden>Este aparelho está configurado pra mostrar menos animação. Escolha "Ligadas" pra ver tudo.</p>
     <p class="ver" id="verTxt"></p>
     <div class="row"><button class="btn" id="resumeBtn" hidden>Voltar à partida</button><button class="btn" id="roomBtn" hidden>Ver a sala</button><button class="btn danger" id="leaveBtn" hidden>Sair da sala</button></div>
   </div>
@@ -769,6 +775,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
     <div class="cer-act">
       <p class="cer-tap" id="cerTap" hidden>Toque para revelar</p>
       <div class="row"><button class="btn gold" id="cerShare" type="button">Compartilhar</button><button class="btn" id="cerNext" type="button">Fechar</button></div>
+      <button class="linkbtn cer-anim" id="cerAnim" type="button" hidden>Ver com animação</button>
     </div>
   </div>
 </div>
@@ -810,7 +817,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='06/11/2026 · 6'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='07/11/2026 · 1'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -821,8 +828,17 @@ const CANON='https://vazwinz.github.io/coup-online/';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,String(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
+/* Animações. Sem escolha, segue o sistema: com "efeitos de animação" desligados no Windows (ou "reduzir movimento" no
+   macOS/celular) o navegador pede menos movimento e o jogo obedece. No Menu dá pra ligar mesmo assim, ou reduzir. */
 const RM=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
-const reduced=()=>RM.matches;
+const animPref=()=>LS.get('coup-anim','');
+const reduced=()=>{const v=animPref();return v==='on'?false:v==='off'?true:RM.matches;};
+function applyAnim(){
+  document.documentElement.classList.toggle('rm',reduced());
+  const sel=$('animSel');if(!sel)return;
+  sel.value=reduced()?'off':'on';$('animNote').hidden=!(RM.matches&&!animPref());
+}
+if(RM.addEventListener)RM.addEventListener('change',applyAnim);else if(RM.addListener)RM.addListener(applyAnim);
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -2721,6 +2737,7 @@ function openCeremony(idx,o={}){
   if(i===0)markSeen();
   c.className='cer'+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
   try{c.focus({preventScroll:true});}catch(err){}
+  $('cerAnim').hidden=!reduced();
   if(reduced()){cerAdd('up','s2','s3','s5','s7','s8','fin');return;}
   requestAnimationFrame(()=>{cerAdd('up');SFX.play('swell');cerBedStart();});
   cerAt(CER_T.s2,()=>{cerAdd('s2');SFX.play('hum');});
@@ -2774,6 +2791,8 @@ $('cer').addEventListener('click',ev=>{
 });
 $('cerX').onclick=()=>closeCeremony();
 $('cerShare').onclick=()=>shareHall(CER.idx);
+// liga as animações neste aparelho e começa a cerimônia de novo, agora inteira
+$('cerAnim').onclick=()=>{LS.set('coup-anim','on');applyAnim();const c=$('cer');c.hidden=true;requestAnimationFrame(()=>openCeremony(CER.idx,{from:CER.from}));};
 $('cerNext').onclick=()=>{
   if(CER.from==='hall'||HALL.list.length<2)return closeCeremony();
   closeCeremony(()=>openHall());
@@ -2787,6 +2806,7 @@ $('cerNext').onclick=()=>{
   setTab(LS.get('coup-tab','solo'));
   refreshInvite(true);
   $('verTxt').textContent='Versão de '+VERSION;
+  applyAnim();$('animSel').onchange=e=>{LS.set('coup-anim',e.target.value);applyAnim();};
   refreshArt();idleStatus();updateChrome();openOv($('menuOv'));
   if(new URLSearchParams(location.search).has('hall'))HALL.pendingCer=true; // link do Hall compartilhado no grupo: abre na cerimônia
   if(new URLSearchParams(location.search).has('placar'))PLACAR.pending=true; // link do placar: abre direto nele
