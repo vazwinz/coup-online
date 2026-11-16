@@ -1023,7 +1023,22 @@ const SFX=(()=>{
       synth(B,t,{freqs:[110,146.83,220],dur:2.4,a:.02,f0:300,fp:2000,fa:.15,f1:450,q:1.5,g:.09,dets:[-8,8],rev:.6});
       noise(B,t,{ft:'lowpass',f:1200,f2:60,dur:1.6,a:.004,g:.4,rev:.6});},
     // o nome batendo no pedestal: seco, sem metal
-    slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});}
+    slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
+    // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
+    zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
+    // ping: um único agudo frio (Mi6, com a oitava de baixo) que ecoa e some. O eco é um atraso de 0,38 s que volta
+    // escurecendo; a realimentação zera até t+3,2 s, então o laço morre sozinho
+    ping(B,t){
+      const c=B.c,g=c.createGain(),o1=c.createOscillator(),o2=c.createOscillator(),g2=c.createGain();
+      o1.type=o2.type='sine';o1.frequency.value=1318.5;o2.frequency.value=659.25;g2.gain.value=.35;
+      env(g,t,.005,1.4,.16);o1.connect(g);o2.connect(g2);g2.connect(g);
+      const dl=c.createDelay(1),fb=c.createGain(),lp=c.createBiquadFilter(),wet=c.createGain();
+      dl.delayTime.value=.38;lp.type='lowpass';lp.frequency.value=2400;wet.gain.value=.8;
+      fb.gain.setValueAtTime(.42,t);fb.gain.linearRampToValueAtTime(0,t+3.2);
+      g.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(wet);
+      route(B,g,{rev:.25});route(B,wet,{rev:.35});
+      o1.start(t);o2.start(t);o1.stop(t+1.5);o2.stop(t+1.5);
+    }
   };
   /* Sons contínuos, controlados por quem chamou. aura: a cama da cerimônia. Um drone grave em Ré (serra saturada,
      filtro respirando e sub) que cresce a cada batida, some num corte seco antes do impacto (junto com o eco, pra
