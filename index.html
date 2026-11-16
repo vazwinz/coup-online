@@ -430,6 +430,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 /* estilo lâmpada (Gustavo): sem o brilho dourado; fundo preto com uma luz neutra de cima */
 .trophy .pc.cut.lamp,.hof .pc.cut.lamp{background:radial-gradient(ellipse 80% 55% at 50% 30%,rgb(225 228 235 / .13),transparent 70%),#050505}
 .trophy .pc.cut.lamp img,.hof .pc.cut.lamp img{filter:drop-shadow(0 0 10px rgb(0 0 0 / .6))}
+/* a estátua dele é cortada nos ombros (o rosto fica embaixo na imagem): na carta grande ela assenta em cima da placa do
+   nome, em vez de afundar atrás dela */
+.trophy .pc.cut.lamp img{box-sizing:border-box;padding:3% 0 28%}
 .linkbtn{padding:2px 4px;border:0;background:none;color:var(--brass);font-size:.86rem;text-decoration:underline;text-underline-offset:3px}
 .linkbtn:hover{color:var(--brass-hi)}
 
@@ -570,13 +573,32 @@ input[type=range]{accent-color:var(--brass);width:100%}
   /* a luz nasce na lâmpada (fim do fio) e espalha pra todo lado, mais pra baixo */
   background:radial-gradient(ellipse 30% 56% at 50% calc(clamp(44px,9vh,90px) + 26px),rgb(255 228 176 / .2),rgb(255 214 150 / .07) 48%,transparent 74%)}
 .cer.t-lampada.lit .cer-cone{opacity:1}
-.cer.t-lampada .cer-cards{display:block;position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;opacity:0}
+/* cartas do Bufão lá no fundo: atrás do pedestal (camada 1, a coluna é a 2), cinzas e pequenas. Caem do teto até a
+   altura do pedestal (--fy, medido) e vão escurecendo longe da lâmpada até sumir no preto. .cf desce; a carta balança
+   (translate), inclina no ar junto (rotate 3D) e gira devagar no próprio plano (transform). Opacas (uma na frente da
+   outra tampa, sem transparência; o véu passa 1 px da borda, senão o serrilhado deixa um contorno claro): a penumbra é um véu
+   preto por cima de cada uma (--k: mais escuro nas mais longe; --e: nas dos cantos, fora do cone). */
+.cer.t-lampada .cer-cards{display:block;position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;opacity:0}
 .cer.t-lampada.lit .cer-cards{opacity:1}
-.cer-cards .cf{position:absolute;left:var(--x);top:-22%;animation:cardFall var(--d) linear var(--dl) infinite}
-.cer-cards .cf .card{transform:scale(var(--z))}
-.cer-cards .card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#000;opacity:var(--k);pointer-events:none}
-@keyframes cardFall{from{transform:translateY(0) rotate(0)}to{transform:translateY(135vh) rotate(var(--r))}}
-.cer.t-lampada .cer-stage{--h:min(44vh,480px);margin-top:clamp(70px,14vh,150px)}
+.cer-cards .cf{position:absolute;left:calc(var(--x) - 44px);top:0;perspective:300px;animation:cardFall var(--d) linear var(--dl) infinite}
+.cer-cards .card{scale:var(--z);box-shadow:none;
+  animation:cardSway var(--sp) ease-in-out var(--sdl) infinite alternate,cardRock var(--sp) ease-in-out var(--sdl) infinite alternate,cardTurn var(--tp) linear var(--tdl) infinite}
+.cer-cards .face{--rc:#7b7e84!important;border-color:#55585e;color:#cfd2d7;overflow:visible} /* visible: o véu precisa cobrir a borda */
+.cer-cards .face::before{border-color:rgb(215 219 225 / .22)}
+.cer-cards .art svg{stroke:#cfd2d7}
+.cer-cards .has-img img{filter:grayscale(1);border-radius:7px}
+.cer-cards .card::after{--v:calc(1 - (1 - var(--k)) * (1 - var(--e,0)));content:"";position:absolute;inset:-3px;border-radius:10px;background:#000;opacity:var(--v);pointer-events:none;
+  animation:cardDim var(--d) linear var(--dl) infinite}
+/* no fim ela já está preta; some de vez (senão a borda clara vaza pelo serrilhado do véu) */
+@keyframes cardFall{0%{transform:translateY(-90px)}88%{opacity:1}100%{transform:translateY(var(--fy,60vh));opacity:0}}
+@keyframes cardDim{0%,40%{opacity:var(--v)}100%{opacity:1}}
+/* balança de um lado pro outro e inclina junto (nunca vira de costas: a face do Bufão fica sempre pra frente) */
+@keyframes cardSway{from{translate:calc(var(--sa) * -1) 0}to{translate:var(--sa) 0}}
+@keyframes cardRock{from{rotate:var(--ax) calc(var(--ra) * -1)}to{rotate:var(--ax) var(--ra)}}
+@keyframes cardTurn{to{transform:rotate(var(--tr))}}
+/* a figura cortada nos ombros é mais larga que a de antes (o rosto ocupa mais da altura): um pouco menor, pra cabeça
+   ficar do tamanho de antes e sobrar pedestal dos lados */
+.cer.t-lampada .cer-stage{--h:min(40vh,440px);margin-top:clamp(70px,14vh,150px)}
 .cer.t-lampada.frame .cer-stage{--h:min(36vh,400px)}
 .cer.t-lampada .cer-mon{opacity:1;transform:none;transition:none}
 /* luz apagada: o quarto some (pedestal, nome e ele); só a lâmpada continua ali, fria */
@@ -584,6 +606,8 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada .cer-pic img,.cer.t-lampada .cer-pic .mono{filter:none;transition:none;opacity:0}
 .cer.t-lampada.s5 .cer-pic img,.cer.t-lampada.s5 .cer-pic .mono{opacity:1}
 .cer.t-lampada .cer-fig.cut .cer-pic img{-webkit-mask:none;mask:none}
+/* a base da estátua vem cortada reto: assenta na borda de cima do pedestal (2 px por trás do friso), sem vão embaixo */
+.cer.t-lampada .cer-fig.cut{margin-bottom:-2px}
 .cer.t-lampada .cer-fig.frm .cer-pic{border-color:#9aa0a8;background:#121314;box-shadow:0 0 0 6px rgb(0 0 0 / .9),0 0 0 7px #3a3d42,0 30px 70px rgb(0 0 0 / .75)}
 .cer.t-lampada .cer-ped{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%231e1f21'/%3E%3Cstop offset='.38' stop-color='%230e0f10'/%3E%3Cstop offset='1' stop-color='%23040404'/%3E%3C/linearGradient%3E%3Cpolygon points='3.5,0 96.5,0 100,100 0,100' fill='url(%23g)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .cer.t-lampada .cer-ped::before{background:linear-gradient(90deg,#4a4d52,#d9dde3 50%,#4a4d52)}
@@ -2780,12 +2804,20 @@ function cerDust(){
    aparece. Tudo agendado com cerAt, então fechar ou pular limpa tudo. */
 const LAMP_T={dark:900,flick:[[70,120],[50,600],[180,90],[40,900],[380,140],[60,1100]],name:1600,act:2600,idle:[4000,9000]};
 const lampLit=on=>$('cer').classList.toggle('lit',!!on);
+/* Cartas lá no fundo, atrás do pedestal: caem do teto até a altura dele e somem no escuro. Cada uma numa faixa da
+   largura (sem amontoar); f é a proximidade: as mais longe ficam menores, caem mais devagar, balançam menos e ficam
+   mais escuras, e as dos cantos (fora do cone da lâmpada) também mais escuras. */
 function lampCards(){
   const box=$('cerCards');box.innerHTML='';if(reduced())return;
-  for(let i=0;i<7;i++){
+  const ped=$('cer').querySelector('.cer-ped'),top=ped?ped.getBoundingClientRect().top:0;
+  box.style.setProperty('--fy',Math.round((top>80?top:innerHeight*.7)-40)+'px'); // o meio da carta acaba uns 20 px atrás da borda do pedestal
+  const N=12,R=Math.random,n=(v,d=2)=>v.toFixed(d);
+  for(let i=0;i<N;i++){
+    const f=R(),x=12+76*(i+.15+R()*.7)/N,d=6.2-2.6*f,sp=.7+R()*.7,tp=5+R()*7;
     const w=document.createElement('div');w.className='cf';
-    const z=.6+Math.random()*.25; /* menores que a carta da mesa; as menores (mais longe) ficam mais no escuro */
-    w.style.cssText=`--x:${(22+Math.random()*52).toFixed(1)}%;--d:${(2.6+Math.random()*1.6).toFixed(2)}s;--dl:${(-Math.random()*3).toFixed(2)}s;--r:${Math.round(Math.random()*540-270)}deg;--z:${z.toFixed(2)};--k:${(1.1-z).toFixed(2)}`;
+    w.style.cssText=`--x:${n(x,1)}%;--z:${n(.22+.22*f)};--d:${n(d)}s;--dl:${n(-R()*d)}s;--k:${n(.5-.3*f)};--e:${n(.45*Math.abs(x-50)/38)};`+
+      `--sa:${n(5+12*f,1)}px;--sp:${n(sp)}s;--sdl:${n(-R()*sp)}s;--ra:${Math.round(45+R()*30)}deg;--ax:${n(.6+R()*.4)} ${n(R()*1.2-.6)} ${n(R()*.5-.25)};`+
+      `--tp:${n(tp)}s;--tdl:${n(-R()*tp)}s;--tr:${R()<.5?'-':''}360deg`;
     w.innerHTML=cardHTML('bufao','md');box.appendChild(w);
   }
 }

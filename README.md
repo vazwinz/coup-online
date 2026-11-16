@@ -46,7 +46,7 @@ Para registrar o campeão da semana:
 
 Foto **sem fundo** (PNG/WebP com transparência) vira estátua no pedestal: marque `"recorte": true`. Foto comum aparece como retrato emoldurado.
 
-**Estilo da cerimônia:** sem nada, é a dourada (palco subindo, batidas, WINNER). Com `"cerimonia": "lampada"` (a do Gustavo, Semana 2), é um quarto escuro com uma lâmpada pendurada falhando: nas piscadas caem cartas do Bufão em cima do pedestal vazio e, depois de um escuro mais longo, o campeão já está lá, com um único agudo ecoando. O nome fica em prata, sem WINNER nem dourado, e o cartão dele no Hall também perde o fundo dourado.
+**Estilo da cerimônia:** sem nada, é a dourada (palco subindo, batidas, WINNER). Com `"cerimonia": "lampada"` (a do Gustavo, Semana 2), é um quarto escuro com uma lâmpada pendurada falhando: nas piscadas aparece o pedestal vazio e, lá no fundo, atrás dele, cartas do Bufão cinzas caindo e sumindo no escuro. Depois de um escuro mais longo, o campeão já está lá, com um único agudo ecoando. O nome fica em prata, sem WINNER nem dourado, e o cartão dele no Hall também perde o fundo dourado. A estátua desse estilo assenta reto no pedestal: a foto recortada deve terminar num corte reto embaixo (como um busto cortado nos ombros).
 
 Outros campos opcionais: `"data"` (ex.: `"2026-11-09"`, aparece no Hall), `"frase"` (aparece embaixo da foto), `"apelidos"` (outros nomes que também ganham a coroa, ex.: `["Zac"]`) e `"enquadramento"` (ex.: `"50% 20%"`, se o rosto ficar cortado). Sem `"semana"`, as semanas são numeradas na ordem do arquivo. Entrada sem foto aparece com a inicial do nome.
 
