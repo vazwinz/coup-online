@@ -2391,7 +2391,8 @@ function normHall(d){
     const pos=typeof x.enquadramento==='string'&&/^\d{1,3}% \d{1,3}%$/.test(x.enquadramento.trim())?x.enquadramento.trim():'50% 30%';
     const frase=typeof x.frase==='string'?cleanTxt(x.frase,120):'';
     const apel=Array.isArray(x.apelidos)?x.apelidos.filter(a=>typeof a==='string').map(normN).filter(Boolean).slice(0,6):[];
-    raw.push({nome,data,num,label,foto,rosto,cut:cut&&!!foto,pos,frase,keys:[normN(nome),...apel],idx});
+    const tema=x.cerimonia==='lampada'?'lampada':'ouro'; // estilo da cerimônia: "lampada" (Gustavo) ou o dourado de sempre
+    raw.push({nome,data,num,label,foto,rosto,cut:cut&&!!foto,pos,frase,keys:[normN(nome),...apel],idx,tema});
   });
   // Ordem cronológica: pelo número da semana se todas têm; senão pela data se todas têm; senão a ordem do arquivo
   const allNum=raw.every(e=>e.num!=null),allData=raw.every(e=>e.data);

@@ -12,5 +12,5 @@
 # Quando a semana fechar, o campeão vai pro hall.json (aí a placa vira a cerimônia dele).
 # Aqui você troca pra próxima semana e zera os pontos.
 
-semana: 2
+semana: 3
 
