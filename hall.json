@@ -7,14 +7,6 @@
       "foto": "hall/semana-01-isaac.webp",
       "rosto": "hall/semana-01-isaac-rosto.webp",
       "recorte": true
-    },
-    {
-      "semana": 2,
-      "nome": "Gustavo",
-      "foto": "hall/semana-02-gustavo.webp",
-      "rosto": "hall/semana-02-gustavo-rosto.webp",
-      "recorte": true,
-      "cerimonia": "lampada"
     }
   ]
 }

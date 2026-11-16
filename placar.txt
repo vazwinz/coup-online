@@ -12,13 +12,5 @@
 # Quando a semana fechar, o campeão vai pro hall.json (aí a placa vira a cerimônia dele).
 # Aqui você troca pra próxima semana e zera os pontos.
 
-semana: 3
+semana: 2
 
-Gustavo: 4
-Isaac: 1
-Vaz: 5
-Igor: 4
-Hércules: 4
-Pedro: 2
-Nicolas: 0
-Caio: 0
