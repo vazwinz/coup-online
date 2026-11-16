@@ -606,7 +606,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada .cer-pic img,.cer.t-lampada .cer-pic .mono{filter:none;transition:none;opacity:0}
 /* ele aparece num fade-in rápido, mesmo com a luz falhando: o fade é na foto e a piscada apaga o quarto (.cer-mon), então
    quando a luz volta ele está mais inteiro. Pular ou animação reduzida: inteiro na hora. */
-.cer.t-lampada.s5 .cer-pic img,.cer.t-lampada.s5 .cer-pic .mono{opacity:1;transition:opacity .8s ease}
+.cer.t-lampada.s5 .cer-pic img,.cer.t-lampada.s5 .cer-pic .mono{opacity:1;transition:opacity .4s ease-out}
 .cer.t-lampada.fin .cer-pic img,.cer.t-lampada.fin .cer-pic .mono{transition:none}
 .cer.t-lampada .cer-fig.cut .cer-pic img{-webkit-mask:none;mask:none}
 /* a base da estátua vem cortada reto: assenta na borda de cima do pedestal (2 px por trás do friso), sem vão embaixo */
@@ -1105,19 +1105,12 @@ const SFX=(()=>{
     slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
     // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
     zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
-    // ping: um único agudo frio (Mi6, com a oitava de baixo) que ecoa e some. O eco é um atraso de 0,38 s que volta
-    // escurecendo; a realimentação zera até t+3,2 s, então o laço morre sozinho. No mínimo do mínimo: um sussurro (lv,
-    // o volume, entra antes do envelope, então o som e o eco têm a mesma forma, só mais baixos)
+    // ping: um único "tim" agudo (Dó7), seco e curto, sem eco, no mínimo do mínimo (pico uns -42 dBFS)
     ping(B,t){
-      const c=B.c,g=c.createGain(),o1=c.createOscillator(),o2=c.createOscillator(),g2=c.createGain(),lv=c.createGain();
-      o1.type=o2.type='sine';o1.frequency.value=1318.5;o2.frequency.value=659.25;g2.gain.value=.35;lv.gain.value=.03;
-      env(g,t,.005,1.4,.16);o1.connect(lv);o2.connect(g2);g2.connect(lv);lv.connect(g);
-      const dl=c.createDelay(1),fb=c.createGain(),lp=c.createBiquadFilter(),wet=c.createGain();
-      dl.delayTime.value=.38;lp.type='lowpass';lp.frequency.value=2400;wet.gain.value=.8;
-      fb.gain.setValueAtTime(.42,t);fb.gain.linearRampToValueAtTime(0,t+3.2);
-      g.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(wet);
-      route(B,g,{rev:.25});route(B,wet,{rev:.35});
-      o1.start(t);o2.start(t);o1.stop(t+1.5);o2.stop(t+1.5);
+      const c=B.c,g=c.createGain(),o=c.createOscillator();
+      o.type='sine';o.frequency.value=2093;
+      env(g,t,.002,.35,.008);o.connect(g);route(B,g,{});
+      o.start(t);o.stop(t+.4);
     }
   };
   /* Sons contínuos, controlados por quem chamou. aura: a cama da cerimônia. Um drone grave em Ré (serra saturada,
@@ -2807,7 +2800,7 @@ function cerDust(){
    alvoroço, num fade-in rápido, com a lâmpada ainda falhando. flick: pares [acesa, apagada] em ms; cada vez que acende,
    um estalo baixinho. idle0 e idle: a espera (ms) até a primeira falha depois que ele aparece (no meio do fade-in) e
    entre as seguintes. Tudo agendado com cerAt, então fechar ou pular limpa tudo. */
-const LAMP_T={dark:900,flick:[[70,120],[50,600],[180,90],[40,900],[380,140],[60,1100]],name:1600,act:2600,idle0:[250,500],idle:[900,2400]};
+const LAMP_T={dark:900,flick:[[70,120],[50,600],[180,90],[40,900],[380,140],[60,1100]],name:1600,act:2600,idle0:[120,260],idle:[900,2400]};
 const lampLit=on=>$('cer').classList.toggle('lit',!!on);
 /* Cartas lá no fundo, atrás do pedestal: caem do teto até a altura dele e somem no escuro. Cada uma numa faixa da
    largura (sem amontoar); f é a proximidade: as mais longe ficam menores, caem mais devagar, balançam menos e ficam
