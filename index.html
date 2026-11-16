@@ -559,6 +559,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer-lamp,.cer-cone,.cer-cards{display:none}
 .cer.t-lampada{background:#030303;transform:none;opacity:0}
 .cer.t-lampada.up{opacity:1;transition:opacity .45s}
+.cer.t-lampada.out{opacity:0;transition:opacity .4s ease-in}
 .cer.t-lampada::before,.cer.t-lampada :is(.cer-sky,.cer-rays,.cer-beam,.cer-haze,.cer-dust,.cer-aura,.cer-win,.cer-liga,.cer-wk),.cer.t-lampada .cer-fig :is(.g1,.g2){display:none}
 .cer.t-lampada .cer-lamp{position:absolute;left:50%;top:0;z-index:4;display:flex;flex-direction:column;align-items:center;translate:-50% 0;pointer-events:none}
 .cer-cord{display:block;width:2px;height:clamp(44px,9vh,90px);background:linear-gradient(#000,#3a3a3a)}
@@ -587,6 +588,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada .cer-ped{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%231e1f21'/%3E%3Cstop offset='.38' stop-color='%230e0f10'/%3E%3Cstop offset='1' stop-color='%23040404'/%3E%3C/linearGradient%3E%3Cpolygon points='3.5,0 96.5,0 100,100 0,100' fill='url(%23g)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .cer.t-lampada .cer-ped::before{background:linear-gradient(90deg,#4a4d52,#d9dde3 50%,#4a4d52)}
 .cer.t-lampada .cer-ped::after{background:linear-gradient(90deg,transparent,rgb(200 205 214 / .35),transparent)}
+/* caixa alta é bem mais larga que o versalete da dourada: aqui o tamanho segue a largura do pedestal, não a da tela */
+.cer.t-lampada .cer-name{font-size:clamp(1rem,calc(min(94vw,calc(var(--h) * 1.02),500px) * .82 / (var(--len) * 1.05)),3.3rem)}
+.cer.t-lampada.frame .cer-name{font-size:clamp(1rem,calc(min(94vw,calc(var(--h) * .95),460px) * .82 / (var(--len) * 1.05)),3.3rem)}
 .cer.t-lampada .cer-name{text-transform:uppercase;background-image:linear-gradient(180deg,#f4f6f9 10%,#b4bac3 52%,#6d737c 90%);filter:drop-shadow(0 1px 0 rgb(0 0 0 / .85))}
 .cer.t-lampada.s7 .cer-name{animation:lampName 1.8s ease both}
 .cer.t-lampada.fin .cer-name{animation:none;opacity:1}
@@ -2874,7 +2878,7 @@ function cerReveal(){
 }
 /* Pula para o fim. Se ainda não tinha revelado, a revelação acontece na hora (com som e clarão). */
 function cerFinish(){
-  const c=$('cer');if(c.classList.contains('s8'))return;
+  const c=$('cer');if(c.hidden||c.classList.contains('out')||c.classList.contains('s8'))return; // fechando: um toque não revive nada
   const revealed=c.classList.contains('s5');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;$('cerTap').hidden=true;
   if(c.classList.contains('t-lampada')){
