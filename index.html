@@ -427,6 +427,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 /* Foto recortada (estátua) nas cartas do Hall: em pé no fundo da carta, com luz dourada atrás */
 .trophy .pc.cut,.hof .pc.cut{background:radial-gradient(ellipse 85% 55% at 50% 42%,rgb(212 160 70 / .3),transparent 70%),radial-gradient(circle at 50% 100%,#2a2010,#0b0905 72%)}
 .trophy .pc.cut img,.hof .pc.cut img{object-fit:contain;object-position:50% 100%!important;filter:drop-shadow(0 0 10px rgb(255 190 80 / .35))}
+/* estilo lâmpada (Gustavo): sem o brilho dourado; fundo preto com uma luz neutra de cima */
+.trophy .pc.cut.lamp,.hof .pc.cut.lamp{background:radial-gradient(ellipse 80% 55% at 50% 30%,rgb(225 228 235 / .13),transparent 70%),#050505}
+.trophy .pc.cut.lamp img,.hof .pc.cut.lamp img{filter:drop-shadow(0 0 10px rgb(0 0 0 / .6))}
 .linkbtn{padding:2px 4px;border:0;background:none;color:var(--brass);font-size:.86rem;text-decoration:underline;text-underline-offset:3px}
 .linkbtn:hover{color:var(--brass-hi)}
 
@@ -2561,7 +2564,7 @@ function renderHall(swap){
     // A placa fica dentro da carta, para respeitar os cantos arredondados e a moldura
     tr.innerHTML=crownSVG('hallCrownG')+'<div class="pc"><div class="plate"><span class="t"></span><b class="nm"></b></div></div>';
     tr.setAttribute('aria-label',`${e.nome}, ${weekLabel(e)}`);
-    tr.querySelector('.pc').prepend(photoEl(e,false));tr.querySelector('.pc').classList.toggle('cut',e.cut);
+    tr.querySelector('.pc').prepend(photoEl(e,false));tr.querySelector('.pc').classList.toggle('cut',e.cut);tr.querySelector('.pc').classList.toggle('lamp',e.tema==='lampada');
     tr.querySelector('.t').textContent=i===0?'Campeão da semana':'Campeão';
     tr.querySelector('.nm').textContent=e.nome;
     box.appendChild(tr);
@@ -2578,7 +2581,7 @@ function renderHall(swap){
         const b=document.createElement('button');b.type='button';
         b.setAttribute('aria-pressed',String(k===i));b.setAttribute('aria-label',`${x.nome}, ${weekLabel(x)}`);
         b.innerHTML='<span class="pc"></span><span class="n"></span><span class="d"></span>';
-        b.querySelector('.pc').appendChild(photoEl(x,true));b.querySelector('.pc').classList.toggle('cut',x.cut);
+        b.querySelector('.pc').appendChild(photoEl(x,true));b.querySelector('.pc').classList.toggle('cut',x.cut);b.querySelector('.pc').classList.toggle('lamp',x.tema==='lampada');
         b.querySelector('.n').textContent=x.nome;b.querySelector('.d').textContent=weekLabel(x);
         b.onclick=()=>{if(HALL.sel===k)return;HALL.sel=k;SFX.play('flip');renderHall(true);box.scrollTo({top:0,behavior:reduced()?'auto':'smooth'});};
         g.appendChild(b);
