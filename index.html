@@ -896,7 +896,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='07/11/2026 · 1'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='16/11/2026 · 1'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -2679,8 +2679,8 @@ function parsePlacar(txt){
     const h=s.match(/^(semana|fim|termina|at[eé])(?=[\s:=]|$)\s*[:=]?\s*(.*)$/i);
     if(h){if(/^semana$/i.test(h[1])){const n=h[2].match(/\d{1,3}/);if(n&&+n[0]>0)out.wk=+n[0];}else out.fim=parseFim(h[2]);return;}
     s=s.replace(/\s+#.*$/,'').replace(/\s*\([^()]*\)\s*$/,'').trim(); // comentário no fim da linha e "(observação)"
-    const m=s.match(/^(.*?)[\s:=|–—-]*(\d{1,6})\s*(?:pts?|pontos?)?\.?$/i),has=!!(m&&m[1].trim());
-    const nome=cleanTxt((has?m[1]:s).replace(/^\d{1,3}\s*[º°ª.)\-–—:]\s*/,'').replace(/[\s:=|–—-]+$/,''),24);
+    const m=s.match(/^(.*?)[\s:=|–—+-]*(\d{1,6})\s*(?:pts?|pontos?)?\.?$/i),has=!!(m&&m[1].trim()); // "Gustavo: +4" vale 4
+    const nome=cleanTxt((has?m[1]:s).replace(/^\d{1,3}\s*[º°ª.)\-–—:]\s*/,'').replace(/[\s:=|–—+-]+$/,''),24);
     if(!nome)return;
     seen.set(normN(nome),{nome,pts:has?+m[2]:0});
   });
