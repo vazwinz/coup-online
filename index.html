@@ -551,6 +551,47 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.fin .cer-win,.cer.fin .cer-name{animation:none;opacity:1;clip-path:none}
 .cer.fin .cer-win{background-position:-70% 0,0 0}
 @media (max-height:700px){.cer-stage{--h:min(42vh,470px)}.cer-win{font-size:clamp(3rem,17vw,6rem)}.cer-ped{height:54px}}
+/* ===== Estilo "lampada" (Gustavo, Semana 2): quarto escuro, uma lâmpada pendurada falhando, cartas do Bufão caindo nas
+   piscadas vazias e ele aparecendo sem alvoroço. lit = luz acesa. Sem transform na coluna e sem clip-path ou mix-blend. */
+.cer-lamp,.cer-cone,.cer-cards{display:none}
+.cer.t-lampada{background:#030303;transform:none;opacity:0}
+.cer.t-lampada.up{opacity:1;transition:opacity .45s}
+.cer.t-lampada::before,.cer.t-lampada :is(.cer-sky,.cer-rays,.cer-beam,.cer-haze,.cer-dust,.cer-aura,.cer-win,.cer-liga,.cer-wk),.cer.t-lampada .cer-fig :is(.g1,.g2){display:none}
+.cer.t-lampada .cer-lamp{position:absolute;left:50%;top:0;z-index:4;display:flex;flex-direction:column;align-items:center;translate:-50% 0;pointer-events:none}
+.cer-cord{display:block;width:2px;height:clamp(44px,9vh,90px);background:linear-gradient(#000,#3a3a3a)}
+.cer-bulb{position:relative;display:block;width:24px;height:32px;margin-top:9px;border-radius:50% 50% 46% 46%/56% 56% 44% 44%;background:radial-gradient(circle at 50% 36%,#3b382f,#141311 72%)}
+.cer-bulb::before{content:"";position:absolute;left:50%;top:-10px;width:12px;height:11px;translate:-50% 0;border-radius:2px 2px 1px 1px;background:linear-gradient(90deg,#1a1a1a,#3d3d3d 50%,#1a1a1a)}
+.cer.lit .cer-bulb{background:radial-gradient(circle at 50% 40%,#fffbea,#ffe3a6 38%,#c79a4c 72%);box-shadow:0 0 16px 6px rgb(255 226 160 / .55),0 0 70px 24px rgb(255 210 140 / .22)}
+.cer.t-lampada .cer-cone{display:block;position:absolute;left:50%;top:0;z-index:0;width:min(170vw,1150px);height:125vh;translate:-50% 0;pointer-events:none;opacity:0;
+  /* a luz nasce na lâmpada (fim do fio) e espalha pra todo lado, mais pra baixo */
+  background:radial-gradient(ellipse 30% 56% at 50% calc(clamp(44px,9vh,90px) + 26px),rgb(255 228 176 / .2),rgb(255 214 150 / .07) 48%,transparent 74%)}
+.cer.t-lampada.lit .cer-cone{opacity:1}
+.cer.t-lampada .cer-cards{display:block;position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;opacity:0}
+.cer.t-lampada.lit .cer-cards{opacity:1}
+.cer-cards .cf{position:absolute;left:var(--x);top:-22%;animation:cardFall var(--d) linear var(--dl) infinite}
+.cer-cards .cf .card{transform:scale(var(--z))}
+@keyframes cardFall{from{transform:translateY(0) rotate(0)}to{transform:translateY(135vh) rotate(var(--r))}}
+.cer.t-lampada .cer-stage{--h:min(44vh,480px);margin-top:clamp(70px,14vh,150px)}
+.cer.t-lampada.frame .cer-stage{--h:min(36vh,400px)}
+.cer.t-lampada .cer-mon{opacity:1;transform:none;transition:none}
+/* luz apagada: o quarto some (pedestal, nome e ele); só a lâmpada continua ali, fria */
+.cer.t-lampada:not(.lit) .cer-mon{opacity:.06}
+.cer.t-lampada .cer-pic img,.cer.t-lampada .cer-pic .mono{filter:none;transition:none;opacity:0}
+.cer.t-lampada.s5 .cer-pic img,.cer.t-lampada.s5 .cer-pic .mono{opacity:1}
+.cer.t-lampada .cer-fig.cut .cer-pic img{-webkit-mask:none;mask:none}
+.cer.t-lampada .cer-fig.frm .cer-pic{border-color:#9aa0a8;background:#121314;box-shadow:0 0 0 6px rgb(0 0 0 / .9),0 0 0 7px #3a3d42,0 30px 70px rgb(0 0 0 / .75)}
+.cer.t-lampada .cer-ped{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%231e1f21'/%3E%3Cstop offset='.38' stop-color='%230e0f10'/%3E%3Cstop offset='1' stop-color='%23040404'/%3E%3C/linearGradient%3E%3Cpolygon points='3.5,0 96.5,0 100,100 0,100' fill='url(%23g)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+.cer.t-lampada .cer-ped::before{background:linear-gradient(90deg,#4a4d52,#d9dde3 50%,#4a4d52)}
+.cer.t-lampada .cer-ped::after{background:linear-gradient(90deg,transparent,rgb(200 205 214 / .35),transparent)}
+.cer.t-lampada .cer-name{text-transform:uppercase;background-image:linear-gradient(180deg,#f4f6f9 10%,#b4bac3 52%,#6d737c 90%);filter:drop-shadow(0 1px 0 rgb(0 0 0 / .85))}
+.cer.t-lampada.s7 .cer-name{animation:lampName 1.8s ease both}
+.cer.t-lampada.fin .cer-name{animation:none;opacity:1}
+@keyframes lampName{from{opacity:0}to{opacity:1}}
+.cer.t-lampada .cer-sub{color:rgb(225 228 233 / .5)}
+.cer.t-lampada .cer-tap{color:#d9dde3;text-shadow:0 0 12px rgb(220 225 235 / .35)}
+/* botões em prata e grafite (nada de dourado nesse estilo) */
+.cer.t-lampada .cer-act .btn{background:#141516;border-color:#3a3d42;color:#d9dde3}
+.cer.t-lampada .cer-act .btn.gold{background:linear-gradient(180deg,#e9ecf0,#a9afb8);border-color:#c9ced6;color:#0d0f12}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px}
 .slot{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.85rem}
 .slot label{cursor:pointer;color:var(--brass);text-decoration:underline;text-underline-offset:3px}
@@ -759,6 +800,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
   <div class="cer-beam l"></div><div class="cer-beam c"></div><div class="cer-beam r"></div>
   <div class="cer-haze"></div>
   <div class="cer-dust" id="cerDust"></div>
+  <div class="cer-cone" aria-hidden="true"></div>
+  <div class="cer-cards" id="cerCards" aria-hidden="true"></div>
+  <div class="cer-lamp" aria-hidden="true"><i class="cer-cord"></i><i class="cer-bulb"></i></div>
   <button class="cer-x" id="cerX" type="button" aria-label="Fechar">×</button>
   <div class="cer-col">
     <p class="cer-liga" id="cerLiga"></p>
@@ -2699,7 +2743,7 @@ async function sharePlacar(){
    três batidas de coração, a luz acende o ouro com aura e faíscas, WINNER abre atrás dele, o nome é gravado.
    Toque durante a cerimônia pula pro final. Pelo link ?hall ela espera um toque para começar as batidas:
    o navegador só libera som depois de um toque, e a revelação sem som perde a graça. */
-const CER={timers:[],idx:0,from:'',wait:false,dust:false,bed:null};
+const CER={timers:[],idx:0,from:'',wait:false,dust:false,bed:null,go:null};
 /* Linha do tempo (ms). As batidas contam a partir de beats; o corte, a revelação e a tensão, a partir da primeira batida;
    o nome e os botões, a partir da revelação. */
 const CER_T={s2:950,s3:1450,beats:2900,beat:[0,640,1180],tension:520,drop:1480,reveal:1700,name:1150,act:2150};
@@ -2723,6 +2767,34 @@ function cerDust(){
   const box=$('cerDust');
   for(let i=0;i<26;i++){const d=document.createElement('i');d.style.cssText=`--x:${(Math.random()*100).toFixed(1)}%;--s:${(1.5+Math.random()*3).toFixed(1)}px;--d:${(6+Math.random()*7).toFixed(1)}s;--dl:${(-Math.random()*13).toFixed(1)}s;--dx:${Math.round(Math.random()*90-45)}px`;box.appendChild(d);}
 }
+/* Cerimônia da lâmpada (Gustavo): escuro, a lâmpada falha, cartas do Bufão caem nas piscadas vazias e ele aparece sem
+   alvoroço. flick: pares [acesa, apagada] em ms; cada vez que acende, um estalo baixinho. idle: piscadas depois que ele
+   aparece. Tudo agendado com cerAt, então fechar ou pular limpa tudo. */
+const LAMP_T={dark:900,flick:[[70,120],[50,600],[180,90],[40,900],[380,140],[60,1100]],name:1600,act:2600,idle:[4000,9000]};
+const lampLit=on=>$('cer').classList.toggle('lit',!!on);
+function lampCards(){
+  const box=$('cerCards');box.innerHTML='';if(reduced())return;
+  for(let i=0;i<7;i++){
+    const w=document.createElement('div');w.className='cf';
+    w.style.cssText=`--x:${(22+Math.random()*52).toFixed(1)}%;--d:${(2.6+Math.random()*1.6).toFixed(2)}s;--dl:${(-Math.random()*3).toFixed(2)}s;--r:${Math.round(Math.random()*540-270)}deg;--z:${(.7+Math.random()*.35).toFixed(2)}`;
+    w.innerHTML=cardHTML('bufao','md');box.appendChild(w);
+  }
+}
+function lampFlicker(){
+  lampCards();let t=LAMP_T.dark;
+  for(const [on,off] of LAMP_T.flick){cerAt(t,()=>{lampLit(true);SFX.play('zap');});t+=on;cerAt(t,()=>lampLit(false));t+=off;}
+  cerAt(t,lampReveal);
+}
+function lampReveal(){
+  $('cerCards').innerHTML='';cerAdd('s5');lampLit(true);SFX.play('ping');
+  cerAt(LAMP_T.name,()=>cerAdd('s7'));cerAt(LAMP_T.act,()=>cerAdd('s8'));
+  lampIdle();
+}
+function lampIdle(){
+  if(reduced())return;
+  const [a,z]=LAMP_T.idle;
+  cerAt(a+Math.random()*(z-a),()=>{lampLit(false);cerAt(60+Math.random()*90,()=>{lampLit(true);SFX.play('zap');lampIdle();});});
+}
 /* Estátua (foto recortada) ou retrato emoldurado. A aura são duas cópias borradas da própria foto, atrás dela. */
 function cerFigure(e){
   const fig=$('cerFig');fig.innerHTML='';fig.style.removeProperty('--ar');
@@ -2741,19 +2813,29 @@ function openCeremony(idx,o={}){
   const L=HALL.list;if(!L.length)return;
   const i=clamp(idx|0,0,L.length-1),e=L[i],c=$('cer');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();cerBedStop();
-  c.querySelectorAll('.cer-spark').forEach(x=>x.remove());
+  c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';
+  const lamp=e.tema==='lampada';
   $('cerLiga').textContent=HALL.liga;
   $('cerWk').textContent=weekLabel(e).toUpperCase();
   const cut=cerFigure(e);
   const nm=$('cerName');nm.textContent=e.nome;nm.style.setProperty('--len',Math.max(4,[...e.nome].length));
-  $('cerSub').textContent=`Campeão · ${nthLabel(e.nth)}`;
+  $('cerSub').textContent=`Campeão · ${lamp?weekLabel(e):nthLabel(e.nth)}`;
   $('cerNext').textContent=CER.from==='hall'?'Voltar':L.length>1?'Ver o Hall':'Fechar';
   $('cerTap').hidden=true;
   cerDust();
   if(i===0)markSeen();
-  c.className='cer'+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
+  c.className='cer'+(lamp?' t-lampada':'')+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
   try{c.focus({preventScroll:true});}catch(err){}
   $('cerAnim').hidden=!reduced();
+  if(lamp){
+    CER.go=lampFlicker;
+    if(reduced()){cerAdd('up','s5','s7','s8','fin');lampLit(true);return;}
+    requestAnimationFrame(()=>cerAdd('up'));
+    if(CER.wait)cerAt(LAMP_T.dark,()=>{if(CER.wait)$('cerTap').hidden=false;});
+    else lampFlicker();
+    return;
+  }
+  CER.go=()=>{cerBedStart();cerBeats();};
   if(reduced()){cerAdd('up','s2','s3','s5','s7','s8','fin');return;}
   requestAnimationFrame(()=>{cerAdd('up');SFX.play('swell');cerBedStart();});
   cerAt(CER_T.s2,()=>{cerAdd('s2');SFX.play('hum');});
@@ -2790,19 +2872,24 @@ function cerFinish(){
   const c=$('cer');if(c.classList.contains('s8'))return;
   const revealed=c.classList.contains('s5');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;$('cerTap').hidden=true;
+  if(c.classList.contains('t-lampada')){
+    $('cerCards').innerHTML='';cerAdd('fin','up','s5','s7','s8');lampLit(true);
+    if(!revealed&&!reduced())SFX.play('ping');
+    lampIdle();return;
+  }
   cerAdd('fin','up','s2','s3','s5','s7','s8');
   if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);}
 }
 function closeCeremony(then){
   const c=$('cer');if(c.hidden)return;
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();
-  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());if(then)then();};
+  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';if(then)then();};
   if(reduced())return done();
   cerAdd('out');setTimeout(done,420);
 }
 $('cer').addEventListener('click',ev=>{
   if(ev.target.closest('button'))return;
-  if(CER.wait){CER.wait=false;$('cerTap').hidden=true;SFX.unlock();cerBedStart();cerBeats();return;}
+  if(CER.wait){CER.wait=false;$('cerTap').hidden=true;SFX.unlock();CER.go();return;}
   cerFinish();
 });
 $('cerX').onclick=()=>closeCeremony();
