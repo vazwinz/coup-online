@@ -1105,12 +1105,16 @@ const SFX=(()=>{
     slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
     // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
     zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
-    // ping: um único "tim" agudo (Dó7), seco e curto, sem eco, no mínimo do mínimo (pico uns -42 dBFS)
+    // ping (o nome ficou): a aura de quando ele aparece, contínua e bem baixinha (pico uns -40 dBFS). Um acorde aberto
+    // e agudo (Mi5, Si5, Mi6) que entra devagar, brilha com um leve batimento (cada nota tem uma gêmea 5 cents acima,
+    // mais fraca) e some devagar, com bastante reverb
     ping(B,t){
-      const c=B.c,g=c.createGain(),o=c.createOscillator();
-      o.type='sine';o.frequency.value=2093;
-      env(g,t,.002,.35,.008);o.connect(g);route(B,g,{});
-      o.start(t);o.stop(t+.4);
+      const c=B.c,g=c.createGain(),lp=c.createBiquadFilter(),LV=.0024;
+      lp.type='lowpass';lp.frequency.value=3200;g.connect(lp);route(B,lp,{rev:.6});
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.6);g.gain.setValueAtTime(1,t+2.2);g.gain.exponentialRampToValueAtTime(.001,t+4.4);
+      [[659.25,1],[987.77,.55],[1318.5,.3]].forEach(([f,a])=>[[0,1],[5,.35]].forEach(([ct,k])=>{
+        const o=c.createOscillator(),v=c.createGain();o.type='sine';o.frequency.value=f;o.detune.value=ct;v.gain.value=a*k*LV;
+        o.connect(v);v.connect(g);o.start(t);o.stop(t+4.5);}));
     }
   };
   /* Sons contínuos, controlados por quem chamou. aura: a cama da cerimônia. Um drone grave em Ré (serra saturada,
