@@ -573,6 +573,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada.lit .cer-cards{opacity:1}
 .cer-cards .cf{position:absolute;left:var(--x);top:-22%;animation:cardFall var(--d) linear var(--dl) infinite}
 .cer-cards .cf .card{transform:scale(var(--z))}
+.cer-cards .card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#000;opacity:var(--k);pointer-events:none}
 @keyframes cardFall{from{transform:translateY(0) rotate(0)}to{transform:translateY(135vh) rotate(var(--r))}}
 .cer.t-lampada .cer-stage{--h:min(44vh,480px);margin-top:clamp(70px,14vh,150px)}
 .cer.t-lampada.frame .cer-stage{--h:min(36vh,400px)}
@@ -2779,7 +2780,8 @@ function lampCards(){
   const box=$('cerCards');box.innerHTML='';if(reduced())return;
   for(let i=0;i<7;i++){
     const w=document.createElement('div');w.className='cf';
-    w.style.cssText=`--x:${(22+Math.random()*52).toFixed(1)}%;--d:${(2.6+Math.random()*1.6).toFixed(2)}s;--dl:${(-Math.random()*3).toFixed(2)}s;--r:${Math.round(Math.random()*540-270)}deg;--z:${(.7+Math.random()*.35).toFixed(2)}`;
+    const z=.6+Math.random()*.25; /* menores que a carta da mesa; as menores (mais longe) ficam mais no escuro */
+    w.style.cssText=`--x:${(22+Math.random()*52).toFixed(1)}%;--d:${(2.6+Math.random()*1.6).toFixed(2)}s;--dl:${(-Math.random()*3).toFixed(2)}s;--r:${Math.round(Math.random()*540-270)}deg;--z:${z.toFixed(2)};--k:${(1.1-z).toFixed(2)}`;
     w.innerHTML=cardHTML('bufao','md');box.appendChild(w);
   }
 }
