@@ -14,10 +14,10 @@
 
 semana: 3
 
-Gustavo: 4
+Gustavo: 6
 Isaac: 2
-Vaz: 6
-Igor: 6
+Vaz: 8
+Igor: 7
 Hércules: 4
 Pedro: 2
 Nicolas: 0
