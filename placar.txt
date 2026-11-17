@@ -16,11 +16,12 @@ semana: 3
 
 Gustavo: 6
 Isaac: 2
-Vaz: 8
+Vaz: 12
 Igor: 7
 Hércules: 4
 Pedro: 2
-Nicolas: 0
-Caio: 0
+Nicolas: 2
+Marcos: 1
+Caio: 2
 Gabriel: 0
 Lucas: 0
