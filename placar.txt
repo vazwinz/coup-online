@@ -15,8 +15,8 @@
 semana: 3
 
 Gustavo: 8
-Isaac: 3
-Vaz: 12
+Isaac: 5
+Vaz: 13
 Igor: 7
 Hércules: 4
 Pedro: 2
