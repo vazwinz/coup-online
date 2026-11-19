@@ -626,6 +626,22 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada .cer-tap{color:#d9dde3;text-shadow:0 0 12px rgb(220 225 235 / .35)}
 /* botões em prata e grafite (nada de dourado nesse estilo) */
 .cer.t-lampada .cer-act .btn{background:#141516;border-color:#3a3d42;color:#d9dde3}
+/* ===== Estilo "explosao" (Vaz, Semana 3): começa igualzinho à dourada (palco, refletores, batidas, aura), com o pedestal
+   vazio. Na revelação, BUM: uma explosão de edição barata (com a borda verde de chroma key mal feito), a tela treme, a
+   aura e o WINNER somem e no pedestal fica a foto crua, sem recorte, torta, com o nome em fonte de meme. ===== */
+.cer-boom{display:none;position:absolute;inset:0;z-index:6;overflow:hidden;pointer-events:none}
+.cer.t-boom .cer-boom{display:block}
+.cer-boom i{position:absolute;left:var(--x);top:var(--y);width:var(--s);aspect-ratio:1;translate:-50% -50%;border-radius:50%;opacity:0;animation:boomFire var(--d) ease-out var(--dl) both}
+.cer-boom i.fire{background:radial-gradient(circle,#fffbd6 0 16%,#ffd43a 30%,#ff8c00 50%,#e04400 66%,transparent 67%);filter:drop-shadow(0 0 2px #3dff2e) drop-shadow(0 0 1px #3dff2e)}
+.cer-boom i.smoke{background:radial-gradient(circle,#57514c 0 38%,#34302d 58%,transparent 70%);animation-name:boomSmoke;animation-timing-function:ease-out}
+@keyframes boomFire{0%{scale:.15;opacity:1}55%{opacity:1}100%{scale:1.25;opacity:0}}
+@keyframes boomSmoke{0%{scale:.3;opacity:0}12%{opacity:.95}100%{scale:1.7;opacity:0;translate:-50% -95%}}
+.cer.t-boom .cer-fig :is(.g1,.g2){display:none}
+.cer.t-boom:not(.s5) .cer-fig{opacity:0}
+.cer.t-boom.s5 :is(.cer-aura,.cer-rays,.cer-beam,.cer-haze,.cer-win){display:none}
+.cer.t-boom .cer-fig.frm .cer-pic{rotate:-9deg;translate:10% 3%;border:0;border-radius:0;background:none;box-shadow:7px 9px 0 rgb(0 0 0 / .5)}
+.cer.t-boom .cer-pic img,.cer.t-boom.s5 .cer-pic img{filter:none;transition:none}
+.cer.t-boom .cer-name{font-family:Impact,Haettenschweiler,"Arial Narrow Bold","Arial Black",sans-serif;letter-spacing:.02em;text-transform:uppercase;background:none;color:#fff;-webkit-text-fill-color:#fff;-webkit-text-stroke:2px #000;paint-order:stroke fill;filter:none}
 .cer.t-lampada .cer-act .btn.gold{background:linear-gradient(180deg,#e9ecf0,#a9afb8);border-color:#c9ced6;color:#0d0f12}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px}
 .slot{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.85rem}
@@ -837,6 +853,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
   <div class="cer-dust" id="cerDust"></div>
   <div class="cer-cone" aria-hidden="true"></div>
   <div class="cer-cards" id="cerCards" aria-hidden="true"></div>
+  <div class="cer-boom" id="cerBoom" aria-hidden="true"></div>
   <div class="cer-lamp" aria-hidden="true"><i class="cer-cord"></i><i class="cer-bulb"></i></div>
   <button class="cer-x" id="cerX" type="button" aria-label="Fechar">×</button>
   <div class="cer-col">
@@ -1102,6 +1119,9 @@ const SFX=(()=>{
       synth(B,t,{freqs:[110,146.83,220],dur:2.4,a:.02,f0:300,fp:2000,fa:.15,f1:450,q:1.5,g:.09,dets:[-8,8],rev:.6});
       noise(B,t,{ft:'lowpass',f:1200,f2:60,dur:1.6,a:.004,g:.4,rev:.6});},
     // o nome batendo no pedestal: seco, sem metal
+    // kaboom: a explosão de edição barata, estourada de propósito ("bass boosted"); o compressor segura o pico
+    kaboom(B,t){noise(B,t,{ft:'lowpass',f:3200,f2:110,dur:1.7,a:.003,g:1,rev:.3});kick(B,t,{f:95,f2:22,dur:1.6,g:1,glide:.6});
+      dist(B,t,{f:55,f2:28,glide:.5,dur:1.4,drive:9,lp:800,g:.5});noise(B,t,{ft:'highpass',f:2200,dur:.12,g:.6});},
     slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
     // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
     zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
@@ -2483,7 +2503,7 @@ function normHall(d){
     const pos=typeof x.enquadramento==='string'&&/^\d{1,3}% \d{1,3}%$/.test(x.enquadramento.trim())?x.enquadramento.trim():'50% 30%';
     const frase=typeof x.frase==='string'?cleanTxt(x.frase,120):'';
     const apel=Array.isArray(x.apelidos)?x.apelidos.filter(a=>typeof a==='string').map(normN).filter(Boolean).slice(0,6):[];
-    const tema=x.cerimonia==='lampada'?'lampada':'ouro'; // estilo da cerimônia: "lampada" (Gustavo) ou o dourado de sempre
+    const tema=['lampada','explosao'].includes(x.cerimonia)?x.cerimonia:'ouro'; // estilo: "lampada" (Gustavo), "explosao" (Vaz) ou o dourado de sempre
     raw.push({nome,data,num,label,foto,rosto,cut:cut&&!!foto,pos,frase,keys:[normN(nome),...apel],idx,tema});
   });
   // Ordem cronológica: pelo número da semana se todas têm; senão pela data se todas têm; senão a ordem do arquivo
@@ -2875,7 +2895,7 @@ function openCeremony(idx,o={}){
   const i=clamp(idx|0,0,L.length-1),e=L[i],c=$('cer');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();cerBedStop();
   c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';
-  const lamp=e.tema==='lampada';
+  const lamp=e.tema==='lampada',boom=e.tema==='explosao';$('cerBoom').innerHTML='';
   $('cerLiga').textContent=HALL.liga;
   $('cerWk').textContent=weekLabel(e).toUpperCase();
   const cut=cerFigure(e);
@@ -2885,7 +2905,7 @@ function openCeremony(idx,o={}){
   $('cerTap').hidden=true;
   cerDust();
   if(i===0)markSeen();
-  c.className='cer'+(lamp?' t-lampada':'')+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
+  c.className='cer'+(lamp?' t-lampada':'')+(boom?' t-boom':'')+(cut?'':' frame');c.hidden=false;void c.offsetWidth;
   try{c.focus({preventScroll:true});}catch(err){}
   $('cerAnim').hidden=!reduced();
   if(lamp){
@@ -2919,7 +2939,25 @@ function cerBeats(){
   T.beat.forEach((ms,k)=>ms?cerAt(ms,()=>cerBeat(k)):cerBeat(k));
   cerAt(T.tension,()=>SFX.play('tension',{len:(T.drop-T.tension)/1000}));
   cerAt(T.drop,()=>{if(CER.bed)CER.bed.drop();}); // corte seco: um instante de silêncio antes do impacto
-  cerAt(T.reveal,cerReveal);
+  cerAt(T.reveal,$('cer').classList.contains('t-boom')?boomReveal:cerReveal);
+}
+/* Estilo "explosao": no lugar da revelação dourada, BUM. A cama some, clarão branco, a tela treme, a explosão e, quando
+   a fumaça baixa, a foto torta no pedestal. */
+function boomReveal(){
+  cerBedStop();cerAdd('s5');SFX.play('kaboom');boomBlast();
+  cerAt(CER_T.name+300,()=>cerAdd('s7'));cerAt(CER_T.act+500,()=>cerAdd('s8'));
+}
+function boomBlast(){
+  if(reduced())return;
+  const c=$('cer'),box=$('cerBoom'),r=$('cerFig').getBoundingClientRect(),o=c.getBoundingClientRect(),R=Math.random,S=Math.min(innerWidth,innerHeight*.8,640);
+  const cx=r.left+r.width/2-o.left,cy=r.top+r.height*.55-o.top,n=v=>v.toFixed(2);
+  const add=(cls,dx,dy,s,d,dl)=>{const i=document.createElement('i');i.className=cls;i.style.cssText=`--x:${Math.round(cx+dx)}px;--y:${Math.round(cy+dy)}px;--s:${Math.round(s)}px;--d:${n(d)}s;--dl:${n(dl)}s`;box.appendChild(i);};
+  box.innerHTML='';add('fire',0,0,S*.95,.75,0);
+  for(let k=0;k<7;k++)add('fire',(R()-.5)*S*.55,(R()-.5)*S*.45,S*(.3+R()*.35),.5+R()*.45,R()*.18);
+  for(let k=0;k<9;k++)add('smoke',(R()-.5)*S*.6,(R()-.35)*S*.45,S*(.4+R()*.4),2.2+R()*1.3,.12+R()*.3);
+  flash('#fff',.95,650);
+  c.animate([{translate:'0 0'},{translate:'14px -10px'},{translate:'-12px 8px'},{translate:'9px 7px'},{translate:'-7px -6px'},{translate:'4px 3px'},{translate:'0 0'}],{duration:520,easing:'linear'});
+  cerAt(4000,()=>{box.innerHTML='';});
 }
 function cerReveal(){
   cerAdd('s5');
@@ -2938,13 +2976,18 @@ function cerFinish(){
     if(!revealed&&!reduced())SFX.play('ping');
     lampIdle(true);return;
   }
+  if(c.classList.contains('t-boom')){
+    cerAdd('fin','up','s2','s3','s5','s7','s8');
+    if(!revealed&&!reduced()){cerBedStop();SFX.play('kaboom');boomBlast();}
+    return;
+  }
   cerAdd('fin','up','s2','s3','s5','s7','s8');
   if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);}
 }
 function closeCeremony(then){
   const c=$('cer');if(c.hidden)return;
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();
-  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';if(then)then();};
+  const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';$('cerBoom').innerHTML='';if(then)then();};
   if(reduced())return done();
   cerAdd('out');setTimeout(done,420);
 }

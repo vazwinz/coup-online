@@ -15,6 +15,12 @@
       "rosto": "hall/semana-02-gustavo-rosto.webp",
       "recorte": true,
       "cerimonia": "lampada"
+    },
+    {
+      "semana": 3,
+      "nome": "Vaz",
+      "foto": "hall/semana-03-vaz.webp",
+      "cerimonia": "explosao"
     }
   ]
 }
