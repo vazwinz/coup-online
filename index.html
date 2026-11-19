@@ -635,7 +635,9 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-boom .cer-fig :is(.g1,.g2){display:none}
 .cer.t-boom:not(.s5) .cer-fig{opacity:0}
 .cer.t-boom.s5 :is(.cer-aura,.cer-rays,.cer-beam,.cer-haze,.cer-win){display:none}
-.cer.t-boom .cer-fig.frm .cer-pic{rotate:-9deg;translate:10% 3%;border:0;border-radius:0;background:none;box-shadow:7px 9px 0 rgb(0 0 0 / .5)}
+.cer.t-boom .cer-fig.frm .cer-pic{rotate:-9deg;translate:10% 3%;border:0;border-radius:0;background:none;box-shadow:7px 9px 0 rgb(0 0 0 / .5);overflow:visible}
+.cer-shades{position:absolute;z-index:2;pointer-events:none}
+.cer-shades svg{display:block;width:100%;height:100%}
 .cer.t-boom .cer-pic img,.cer.t-boom.s5 .cer-pic img{filter:none;transition:none}
 .cer.t-boom .cer-name{font-family:Impact,Haettenschweiler,"Arial Narrow Bold","Arial Black",sans-serif;letter-spacing:.02em;text-transform:uppercase;background:none;color:#fff;-webkit-text-fill-color:#fff;-webkit-text-stroke:2px #000;paint-order:stroke fill;filter:none}
 .cer.t-lampada .cer-act .btn.gold{background:linear-gradient(180deg,#e9ecf0,#a9afb8);border-color:#c9ced6;color:#0d0f12}
@@ -1131,6 +1133,12 @@ const SFX=(()=>{
       const o=c.createOscillator(),og=c.createGain();o.type='square';o.frequency.setValueAtTime(190,t);o.frequency.exponentialRampToValueAtTime(32,t+.36);
       og.gain.setValueAtTime(.22,t);og.gain.setValueAtTime(.14,t+.12);og.gain.setValueAtTime(.07,t+.24);og.gain.setValueAtTime(0,t+.36);
       o.connect(og);route(B,og,{});o.start(t);o.stop(t+.4);},
+    // dun: o "DUN DUN DUUUN" dramático dos zooms (k = 0, 1, 2; o último mais grave e comprido)
+    dun(B,t,o){const k=(o&&o.k)|0,f=[110,110,82.41][k]||110,len=k===2?1.2:.34;
+      synth(B,t,{type:'sawtooth',freqs:[f,f*1.5,f*2],dur:len,a:.005,f0:260,fp:1900,fa:.03,f1:420,q:1,g:.2,drive:2,dets:[-6,6],rev:.35});
+      kick(B,t,{f:120,f2:48,dur:.28,g:.55});},
+    // airhorn: a buzina de estádio, três buzinadas estouradas (curta, curta, longa)
+    airhorn(B,t){[[0,.16],[.22,.16],[.44,.65]].forEach(([dt,len])=>synth(B,t+dt,{type:'sawtooth',freqs:[415,523.25,622.25],dur:len,a:.008,f0:2600,fp:2600,fa:.01,f1:1900,q:.8,g:.24,drive:3,dets:[-14,0,14],rev:.2}));},
     slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
     // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
     zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
@@ -2513,7 +2521,8 @@ function normHall(d){
     const frase=typeof x.frase==='string'?cleanTxt(x.frase,120):'';
     const apel=Array.isArray(x.apelidos)?x.apelidos.filter(a=>typeof a==='string').map(normN).filter(Boolean).slice(0,6):[];
     const tema=['lampada','explosao'].includes(x.cerimonia)?x.cerimonia:'ouro'; // estilo: "lampada" (Gustavo), "explosao" (Vaz) ou o dourado de sempre
-    raw.push({nome,data,num,label,foto,rosto,cut:cut&&!!foto,pos,frase,keys:[normN(nome),...apel],idx,tema});
+    const oculos=Array.isArray(x.oculos)&&x.oculos.length>=3&&x.oculos.slice(0,4).every(v=>typeof v==='number'&&isFinite(v))?x.oculos.slice(0,4):null; // onde ficam os olhos na foto (estilo "explosao")
+    raw.push({nome,data,num,label,foto,rosto,cut:cut&&!!foto,pos,frase,keys:[normN(nome),...apel],idx,tema,oculos});
   });
   // Ordem cronológica: pelo número da semana se todas têm; senão pela data se todas têm; senão a ordem do arquivo
   const allNum=raw.every(e=>e.num!=null),allData=raw.every(e=>e.data);
@@ -2904,7 +2913,7 @@ function openCeremony(idx,o={}){
   const i=clamp(idx|0,0,L.length-1),e=L[i],c=$('cer');
   CER.timers.forEach(clearTimeout);CER.timers=[];CER.idx=i;CER.from=o.from||'';CER.wait=!!o.gated&&!reduced();cerBedStop();
   c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';
-  const lamp=e.tema==='lampada',boom=e.tema==='explosao';$('cerBoom').innerHTML='';
+  const lamp=e.tema==='lampada',boom=e.tema==='explosao';$('cerBoom').innerHTML='';boomZoomStop();
   $('cerLiga').textContent=HALL.liga;
   $('cerWk').textContent=weekLabel(e).toUpperCase();
   const cut=cerFigure(e);
@@ -2926,7 +2935,7 @@ function openCeremony(idx,o={}){
     return;
   }
   CER.go=()=>{cerBedStart();cerBeats();};
-  if(reduced()){cerAdd('up','s2','s3','s5','s7','s8','fin');return;}
+  if(reduced()){cerAdd('up','s2','s3','s5','s7','s8','fin');if(boom)boomShades(true);return;}
   requestAnimationFrame(()=>{cerAdd('up');SFX.play('swell');cerBedStart();});
   cerAt(CER_T.s2,()=>{cerAdd('s2');SFX.play('hum');});
   cerAt(CER_T.s3,()=>{cerAdd('s3');SFX.play('rumble');});
@@ -2950,22 +2959,63 @@ function cerBeats(){
   cerAt(T.drop,()=>{if(CER.bed)CER.bed.drop();}); // corte seco: um instante de silêncio antes do impacto
   cerAt(T.reveal,$('cer').classList.contains('t-boom')?boomReveal:cerReveal);
 }
-/* Estilo "explosao": no lugar da revelação dourada, BUM. A cama some, clarão branco, a tela treme, a explosão e, quando
-   a fumaça baixa, a foto torta no pedestal. */
+/* Estilo "explosao" (Vaz): no lugar da revelação dourada, uma edição tosca de propósito. O BUM toca antes e a explosão
+   chega meio segundo atrasada: um GIF de pixel grosso, travado, com o xadrez de PNG falso, fora do lugar e cortado
+   seco no meio da fumaça. Depois, três zooms secos na cara (DUN, DUN, DUUUN), um óculos pixelado desce do alto e
+   encaixa, a buzina de estádio e o nome. BOOM_T: os tempos (ms) depois da revelação. */
+const BOOM_T={blast:500,zoom:2500,zoomStep:450,zoomEnd:4300,shades:4400,shadesDur:1400,horn:5800,name:6000,act:6800};
 function boomReveal(){
-  cerBedStop();cerAdd('s5');SFX.play('kaboom');boomBlast();
-  cerAt(CER_T.name+300,()=>cerAdd('s7'));cerAt(CER_T.act+500,()=>cerAdd('s8'));
+  const T=BOOM_T;cerBedStop();SFX.play('kaboom');
+  cerAt(T.blast,()=>{cerAdd('s5');boomBlast();});
+  cerAt(T.zoom,boomZoom);[0,1,2].forEach(k=>cerAt(T.zoom+k*T.zoomStep,()=>SFX.play('dun',{k})));
+  cerAt(T.shades,()=>boomShades(false));cerAt(T.horn,()=>SFX.play('airhorn'));
+  cerAt(T.name,()=>cerAdd('s7'));cerAt(T.act,()=>cerAdd('s8'));
 }
-/* ===== Explosão em pixel art =====
-   Um sprite desenhado na hora: canvas de 72×72 pixels ampliado um número inteiro de vezes (pixel grande e reto,
-   image-rendering: pixelated) e redesenhado 15 vezes por segundo, como animação de videogame. Bola de fogo em gomos
-   (miolo branco que esfria pra amarelo, laranja, vermelho e vinho, com luz do alto à esquerda), explosões menores em
-   seguida, anel de choque, faíscas que caem, fumaça cinza que sobe e se desfaz em pixels. Paleta curta com dithering
-   de Bayer 4×4 e contorno escuro; nenhum pixel meio transparente. */
-const BOOM={N:72,FPS:15,DUR:3.2,CX:36,CY:42};
+/* Onde ficam os olhos na tela: o hall.json diz onde estão na foto ("oculos": [x, y, largura, giro], frações da foto e
+   graus); aqui vira posição dentro do quadro, que corta a foto com object-fit: cover. */
+function boomEyes(){
+  const pic=$('cerFig').querySelector('.cer-pic'),img=pic&&pic.querySelector('img.main'),e=HALL.list[CER.idx]||{};
+  if(!img||!img.naturalWidth)return null;
+  const [nx,ny,nw,rot]=e.oculos||[.5,.42,.42,0],W=pic.clientWidth,H=pic.clientHeight,sc=Math.max(W/img.naturalWidth,H/img.naturalHeight);
+  const iw=img.naturalWidth*sc,ih=img.naturalHeight*sc,pos=(getComputedStyle(img).objectPosition||'50% 50%').split(' ').map(v=>parseFloat(v)/100);
+  const ox=(W-iw)*(isNaN(pos[0])?.5:pos[0]),oy=(H-ih)*(isNaN(pos[1])?.5:pos[1]);
+  return {pic,x:ox+nx*iw,y:oy+ny*ih,w:nw*iw,rot:rot||0};
+}
+const SHADES=['XXXXXXXXXXXXXXXXXXXXXX','.XWWXXXXXX..XWWXXXXXX.','.XXWWXXXXX..XXWWXXXXX.','..XXXXXXX....XXXXXXX..','...XXXXX......XXXXX...'];
+/* O óculos pixelado: desce do alto da tela em degraus e encaixa nos olhos (instant: já no lugar). */
+function boomShades(instant){
+  const img=$('cerFig').querySelector('img.main');
+  if(img&&!img.naturalWidth){img.addEventListener('load',()=>boomShades(true),{once:true});return;}
+  const E=boomEyes();if(!E)return;
+  E.pic.querySelectorAll('.cer-shades').forEach(x=>x.remove());
+  const sh=document.createElement('div');sh.className='cer-shades';
+  const h=E.w*SHADES.length/SHADES[0].length;
+  sh.style.cssText=`left:${E.x-E.w/2}px;top:${E.y-h*.45}px;width:${E.w}px;height:${h}px;rotate:${E.rot}deg`;
+  sh.innerHTML=`<svg viewBox="0 0 ${SHADES[0].length} ${SHADES.length}" shape-rendering="crispEdges" aria-hidden="true">${SHADES.map((r,y)=>[...r].map((ch,x)=>ch==='.'?'':`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${ch==='W'?'#fff':'#000'}"/>`).join('')).join('')}</svg>`;
+  E.pic.appendChild(sh);
+  if(instant||reduced())return;
+  const up=sh.getBoundingClientRect().bottom+40;
+  sh.animate([{translate:`0 ${-up}px`},{translate:'0 0'}],{duration:BOOM_T.shadesDur,easing:'steps(14,end)'});
+}
+/* Três zooms secos na cara, cada um mais perto, e volta. Uma animação só (sem fill), guardada em CER.zoom pra ser
+   cancelada se fechar no meio. */
+function boomZoom(){
+  if(reduced())return;
+  const c=$('cer'),E=boomEyes();if(!E)return;
+  const m=document.createElement('i');m.style.cssText=`position:absolute;left:${E.x}px;top:${E.y}px`;E.pic.appendChild(m);
+  const r=m.getBoundingClientRect(),o=c.getBoundingClientRect();m.remove();
+  c.style.transformOrigin=`${Math.round(r.left-o.left)}px ${Math.round(r.top-o.top)}px`;
+  const T=BOOM_T,f=T.zoomStep/(T.zoomEnd-T.zoom),st='steps(1,end)';
+  CER.zoom=c.animate([{scale:1.3,easing:st},{scale:1.65,offset:f,easing:st},{scale:2.1,offset:2*f,easing:st},{scale:2.1,offset:.999,easing:st},{scale:1}],{duration:T.zoomEnd-T.zoom});
+}
+function boomZoomStop(){if(CER.zoom){CER.zoom.cancel();CER.zoom=null;}$('cer').style.transformOrigin='';}
+/* ===== A explosão: um GIF tosco em pixel art =====
+   Canvas de 36×36 pixels ampliado um número inteiro de vezes (pixel bem grosso, image-rendering: pixelated), 6 quadros
+   por segundo, poucas cores e sem dithering, contorno preto e o fundo com o xadrez de "PNG transparente" que não é
+   transparente. Estoura de lado, maior que o quadrado (a borda reta corta o fogo), e some de uma vez no meio da fumaça. */
+const BOOM={N:36,FPS:6,CUT:1.6,CX:22,CY:21};
 const boomRGB=h=>{const v=parseInt(h.slice(1),16);return(0xff000000|(v&255)<<16|(v>>8&255)<<8|v>>16)>>>0;}; // ImageData em little-endian: AABBGGRR
-const BOOM_FIRE=['#7a1420','#d8341c','#ff8a1f','#ffd93b','#fffbe6'].map(boomRGB),BOOM_SMOKE=['#45404c','#78727a','#b5aeb0'].map(boomRGB);
-const BOOM_LINE=[0,boomRGB('#25080f'),boomRGB('#1a1820')],BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
+const BOOM_FIRE=['#c81e1e','#ff7f00','#ffe600'].map(boomRGB),BOOM_SMOKE=['#5a5a5a','#9a9a9a'].map(boomRGB),BOOM_INK=boomRGB('#000000'),BOOM_CHK=['#ffffff','#cccccc'].map(boomRGB);
 function boomNoise(seed){ // ruído de valor 2D, suave
   const h=(x,y)=>{let n=(Math.imul(x,374761393)+Math.imul(y,668265263)+seed)|0;n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967296;};
   return(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),a=h(xi,yi),b=h(xi+1,yi),c=h(xi,yi+1),d=h(xi+1,yi+1);
@@ -2974,68 +3024,44 @@ function boomNoise(seed){ // ruído de valor 2D, suave
 function boomBlast(){
   if(reduced())return;
   const c=$('cer'),box=$('cerBoom'),r=$('cerFig').getBoundingClientRect(),o=c.getBoundingClientRect(),R=Math.random,{N,FPS,CX,CY}=BOOM;
-  const k=Math.max(4,Math.round(Math.min(innerWidth*1.1,innerHeight*.72,760)/N)); // tamanho do pixel na tela, inteiro
+  const k=Math.max(8,Math.round(Math.min(innerWidth*1.1,innerHeight*.72,760)/N)); // tamanho do pixel na tela, inteiro
   const cv=document.createElement('canvas');cv.width=cv.height=N;
-  cv.style.cssText=`width:${N*k}px;height:${N*k}px;left:${Math.round(r.left+r.width/2-o.left-CX*k)}px;top:${Math.round(r.top+r.height*.72-o.top-CY*k)}px`;
+  cv.style.cssText=`width:${N*k}px;height:${N*k}px;left:${Math.round(r.left+r.width*.8-o.left-N*k/2)}px;top:${Math.round(r.top+r.height*.6-o.top-N*k/2)}px`;
   box.innerHTML='';box.appendChild(cv);
   const g=cv.getContext('2d'),img=g.createImageData(N,N),px=new Uint32Array(img.data.buffer),kind=new Uint8Array(N*N),nz=boomNoise(R()*1e9|0);
-  // gomos do fogo: [x, y, raio, começa (s), dura (s)]. O do meio, oito em volta e quatro explosões menores em seguida
-  const lumps=[[CX,CY,19,0,1.35]];
-  for(let i=0;i<8;i++){const a=i/8*Math.PI*2+R()*.5,d=9+R()*5;lumps.push([CX+Math.cos(a)*d,CY+Math.sin(a)*d*.85,11+R()*5,0,1.05+R()*.35]);}
-  [[-19,-10,.2],[18,-5,.42],[-8,15,.6],[13,-20,.8]].forEach(([dx,dy,t0])=>{for(let i=0;i<3;i++)lumps.push([CX+dx+(R()-.5)*7,CY+dy+(R()-.5)*7,5+R()*4,t0,.55+R()*.15]);});
-  // fumaça: [x, y, raio, começa (s), sobe (px/s)]
-  const puffs=[];for(let i=0;i<12;i++){const a=-Math.PI*(.08+R()*.84);puffs.push([CX+Math.cos(a)*(6+R()*13),CY+Math.sin(a)*(4+R()*10),11+R()*6,.22+R()*.5,8+R()*9]);}
-  // faíscas: [vx, vy, vida (s)]; a gravidade puxa pra baixo
-  const sparks=[];for(let i=0;i<22;i++){const a=-Math.PI*(R()*1.1-.05),v=24+R()*34;sparks.push([Math.cos(a)*v,Math.sin(a)*v,.7+R()*.7]);}
+  // gomos do fogo: [x, y, raio, começa (s), dura (s)]
+  const lumps=[[CX,CY,10,0,1.35]];
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2+R()*.6,d=5+R()*3;lumps.push([CX+Math.cos(a)*d,CY+Math.sin(a)*d*.85,6+R()*3,0,1.05+R()*.35]);}
+  [[-10,-5,.2],[9,-3,.42],[-4,8,.6]].forEach(([dx,dy,t0])=>lumps.push([CX+dx,CY+dy,3+R()*2,t0,.55]));
+  const puffs=[];for(let i=0;i<8;i++){const a=-Math.PI*(.08+R()*.84);puffs.push([CX+Math.cos(a)*(3+R()*6),CY+Math.sin(a)*(2+R()*5),6+R()*3,.2+R()*.4,4+R()*4]);}
+  const sparks=[];for(let i=0;i<8;i++){const a=-Math.PI*(R()*1.1-.05),v=12+R()*14;sparks.push([Math.cos(a)*v,Math.sin(a)*v,.6+R()*.6]);}
   const draw=f=>{
-    const t=f/FPS;px.fill(0);kind.fill(0);
+    const t=f/FPS;kind.fill(0);
     const L=[],P=[];
-    for(const [x,y,lr,t0,life] of lumps){const a=(t-t0)/life;if(a<0||a>1)continue;
-      L.push([x,y-5*a*life,lr*(.3+.7*Math.min(1,a/.2))*(1+.12*a),1.28-1.45*a,Math.max(0,a-.3)*1.3]);}
-    for(const [x,y,pr,t0,up] of puffs){const a=(t-t0)/1.9;if(a<0||a>1)continue;
-      P.push([x,y-up*(t-t0),pr*(.35+.65*Math.min(1,a/.45)),1-Math.max(0,(a-.45)/.55)]);}
-    const ring=t<.4?6+125*t:-9;
+    for(const [x,y,lr,t0,life] of lumps){const a=(t-t0)/life;if(a<0||a>1)continue;L.push([x,y-3*a*life,lr*(.35+.65*Math.min(1,a/.2)),1.25-1.4*a,Math.max(0,a-.35)*1.2]);}
+    for(const [x,y,pr,t0,up] of puffs){const a=(t-t0)/1.9;if(a<0||a>1)continue;P.push([x,y-up*(t-t0),pr*(.4+.6*Math.min(1,a/.4))]);}
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-      const i=y*N+x,b=BAYER[(y&3)*4+(x&3)],X=x+.5,Y=y+.5;
-      // fogo: o gomo mais quente manda
-      let hv=-9;
-      if(f===0&&Math.hypot(X-CX,Y-CY)<17+(b-.5)*5)hv=2; // primeiro quadro: um clarão redondo
-      for(const [lx,ly,rr,temp,brk] of L){const dx=X-lx,dy=Y-ly;if(dx>rr||dx<-rr||dy>rr||dy<-rr)continue;
-        const d=Math.sqrt(dx*dx+dy*dy);if(d>=rr)continue;
-        let q=(1-d/rr+.17*(-dx*.6-dy*.8)/rr)*temp;
-        if(brk)q-=brk*nz(X*.24,Y*.24-t*3);
-        if(q>hv)hv=q;}
-      const hd=hv+(b-.5)*.16;
-      if(hd>.07){px[i]=BOOM_FIRE[hd>.8?4:hd>.6?3:hd>.42?2:hd>.24?1:0];kind[i]=1;continue;}
-      // anel de choque (some em dithering)
-      if(ring>0&&Math.abs(Math.hypot(X-CX,Y-CY)-ring)<.9&&b<1-t/.4){px[i]=BOOM_FIRE[t<.15?4:3];kind[i]=3;continue;}
-      // fumaça (atrás do fogo), com luz do alto à esquerda; no fim se desfaz em pixels
-      let sv=-9;
-      for(const [sx,sy,rr,dens] of P){const dx=X-sx,dy=Y-sy;if(dx>rr||dx<-rr||dy>rr||dy<-rr)continue;
-        const d=Math.sqrt(dx*dx+dy*dy);if(d>=rr)continue;
-        const q=1-d/rr+.22*(-dx*.6-dy*.8)/rr-(1-dens)*1.05;if(q>sv)sv=q;}
-      const sd=sv+(b-.5)*.22;
-      if(sd>.1){px[i]=BOOM_SMOKE[sd>.62?2:sd>.36?1:0];kind[i]=2;}
+      const i=y*N+x,X=x+.5,Y=y+.5;
+      let hv=f===0&&Math.hypot(X-CX,Y-CY)<9?1:-9;
+      for(const [lx,ly,rr,temp,brk] of L){const dx=X-lx,dy=Y-ly,d=Math.sqrt(dx*dx+dy*dy);if(d>=rr)continue;
+        let q=(1-d/rr)*temp;if(brk)q-=brk*nz(X*.35,Y*.35-t*2);if(q>hv)hv=q;}
+      if(hv>.1){px[i]=BOOM_FIRE[hv>.62?2:hv>.35?1:0];kind[i]=1;continue;}
+      let sv=-9;for(const [sx,sy,rr] of P){const dx=X-sx,dy=Y-sy,d=Math.sqrt(dx*dx+dy*dy);if(d<rr&&1-d/rr>sv)sv=1-d/rr;}
+      if(sv>.12){px[i]=BOOM_SMOKE[sv>.5?1:0];kind[i]=2;continue;}
+      px[i]=BOOM_CHK[(x+y)&1];
     }
-    // faíscas por cima, com um pixel de rastro
-    for(const [vx,vy,life] of sparks){if(t>life)continue;const a=t/life,col=a<.15?4:a<.35?3:a<.6?2:a<.85?1:0;
-      [[t,col],[t-1/FPS,Math.max(0,col-1)]].forEach(([tt,cc])=>{if(tt<0)return;const x=Math.round(CX+vx*tt),y=Math.round(CY+vy*tt+35*tt*tt);
-        if(x>=0&&x<N&&y>=0&&y<N&&!kind[y*N+x]){px[y*N+x]=BOOM_FIRE[cc];kind[y*N+x]=3;}});}
-    // fiapo de fumaça sozinho (sobra do dithering) some, senão vira um losango com o contorno
-    for(let i=0;i<N*N;i++)if(kind[i]===2&&kind[i-1]!==2&&kind[i+1]!==2&&kind[i-N]!==2&&kind[i+N]!==2){px[i]=0;kind[i]=0;}
-    // contorno escuro em volta do fogo e da fumaça
-    for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=y*N+x;if(kind[i])continue;
-      const nb=[x>0?kind[i-1]:0,x<N-1?kind[i+1]:0,y>0?kind[i-N]:0,y<N-1?kind[i+N]:0];
-      const w=nb.includes(1)?1:nb.includes(2)?2:0;if(w)px[i]=BOOM_LINE[w];}
+    for(const [vx,vy,life] of sparks){if(t>life)continue;const x=Math.round(CX+vx*t),y=Math.round(CY+vy*t+18*t*t);
+      if(x>=0&&x<N&&y>=0&&y<N&&!kind[y*N+x]){px[y*N+x]=BOOM_FIRE[t/life<.4?2:1];kind[y*N+x]=3;}}
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=y*N+x;if(kind[i])continue; // contorno preto
+      if((x>0&&kind[i-1]&3&&kind[i-1]<3)||(x<N-1&&kind[i+1]&&kind[i+1]<3)||(y>0&&kind[i-N]&&kind[i-N]<3)||(y<N-1&&kind[i+N]&&kind[i+N]<3))px[i]=BOOM_INK;}
     g.putImageData(img,0,0);
   };
-  const frames=Math.round(BOOM.DUR*FPS);
+  const frames=Math.floor(BOOM.CUT*FPS);
   for(let f=0;f<=frames;f++)f?cerAt(f*1000/FPS,()=>draw(f)):draw(0);
-  cerAt((frames+1)*1000/FPS,()=>{box.innerHTML='';});
-  // clarão e tremida em degraus, como num jogo antigo
+  cerAt(BOOM.CUT*1000,()=>{box.innerHTML='';}); // corte seco, no meio da fumaça
   const fl=document.createElement('div');fl.className='fxflash';fl.style.background='#fff';fxl.appendChild(fl);
   fl.animate([{opacity:.95,easing:'steps(1,end)'},{opacity:.55,offset:.34,easing:'steps(1,end)'},{opacity:.2,offset:.67,easing:'steps(1,end)'},{opacity:0}],{duration:200}).onfinish=()=>fl.remove();
-  c.animate([[2,-1],[-2,1],[1,1],[-1,-1],[1,0],[0,0]].map(([x,y])=>({translate:`${x*k}px ${y*k}px`,easing:'steps(1,end)'})),{duration:400});
+  c.animate([[2,-1],[-2,1],[1,1],[-1,-1],[1,0],[0,0]].map(([x,y])=>({translate:`${x*k/2}px ${y*k/2}px`,easing:'steps(1,end)'})),{duration:400});
 }
 function cerReveal(){
   cerAdd('s5');
@@ -3056,15 +3082,15 @@ function cerFinish(){
   }
   if(c.classList.contains('t-boom')){
     cerAdd('fin','up','s2','s3','s5','s7','s8');
-    if(!revealed&&!reduced()){cerBedStop();SFX.play('kaboom');boomBlast();}
-    return;
+    boomZoomStop();if(!revealed&&!reduced()){cerBedStop();SFX.play('kaboom');boomBlast();}else $('cerBoom').innerHTML='';
+    boomShades(true);return;
   }
   cerAdd('fin','up','s2','s3','s5','s7','s8');
   if(!revealed&&!reduced()){SFX.play('braam');cerBedStart();if(CER.bed)CER.bed.reveal();flash('#ffe9b8',.36,600);}
 }
 function closeCeremony(then){
   const c=$('cer');if(c.hidden)return;
-  CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();
+  CER.timers.forEach(clearTimeout);CER.timers=[];CER.wait=false;cerBedStop();boomZoomStop();
   const done=()=>{c.hidden=true;c.className='cer';c.querySelectorAll('.cer-spark').forEach(x=>x.remove());$('cerCards').innerHTML='';$('cerBoom').innerHTML='';if(then)then();};
   if(reduced())return done();
   cerAdd('out');setTimeout(done,420);

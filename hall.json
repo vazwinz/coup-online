@@ -20,7 +20,13 @@
       "semana": 3,
       "nome": "Vaz",
       "foto": "hall/semana-03-vaz.webp",
-      "cerimonia": "explosao"
+      "cerimonia": "explosao",
+      "oculos": [
+        0.52,
+        0.71,
+        0.4,
+        9
+      ]
     }
   ]
 }
