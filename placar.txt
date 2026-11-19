@@ -20,9 +20,9 @@ Vaz: 15
 Igor: 10
 Hércules: 4
 Pedro: 2
-Nicolas: 6
+Nicolas: 7
 Marcos: 1
-Emerson: 3
+Emerson: 5
 Caio: 2
 Gabriel: 0
 Lucas: 0
