@@ -639,7 +639,14 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer-shades{position:absolute;z-index:2;pointer-events:none}
 .cer-shades svg{display:block;width:100%;height:100%}
 .cer.t-boom .cer-pic img,.cer.t-boom.s5 .cer-pic img{filter:none;transition:none}
-.cer.t-boom .cer-name{font-family:Impact,Haettenschweiler,"Arial Narrow Bold","Arial Black",sans-serif;letter-spacing:.02em;text-transform:uppercase;background:none;color:#fff;-webkit-text-fill-color:#fff;-webkit-text-stroke:2px #000;paint-order:stroke fill;filter:none}
+.cer.t-boom .cer-name{font-family:Impact,Haettenschweiler,"Arial Narrow Bold","Arial Black",sans-serif;letter-spacing:.06em;text-transform:uppercase;background:none;filter:none;
+  color:#c8141e;-webkit-text-fill-color:#c8141e;padding:.06em .3em .02em;border:.08em solid #c8141e;border-radius:.08em;box-shadow:inset 0 0 0 .05em #f4ece6,inset 0 0 0 .1em #c8141e;rotate:-8deg;
+  /* carimbo ralé: a tinta falha (máscara de ruído) */
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.6 2.05'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/90px 90px;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.6 2.05'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/90px 90px}
+.cer.t-boom.s7 .cer-name{animation:stampIn .26s cubic-bezier(.3,0,.4,1) both}
+.cer.t-boom.fin .cer-name{animation:none;opacity:1}
+@keyframes stampIn{0%{opacity:0;scale:2.8}70%{opacity:1;scale:.94}100%{opacity:1;scale:1}}
 .cer.t-lampada .cer-act .btn.gold{background:linear-gradient(180deg,#e9ecf0,#a9afb8);border-color:#c9ced6;color:#0d0f12}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px}
 .slot{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.85rem}
@@ -911,7 +918,7 @@ const MODES={classico:'Clássico',mentalista:'Mentalista'};
 const PREFIX='coupvaz-v1-';
 const CODECH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CANCEL=Symbol('cancel');
-const VERSION='16/11/2026 · 1'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
+const VERSION='19/11/2026 · 1'; // aparece no rodapé do Menu: é como se confere se o aparelho pegou a atualização
 const TURN_S=30; // tempo total da vez no online: ação + alvo + chute somados
 const PROTO=2; // versão do protocolo online; host e convidados avisam quando estão em versões diferentes
 const KEYRX=/^[0-9a-f]{32}$/;
@@ -1139,6 +1146,8 @@ const SFX=(()=>{
       kick(B,t,{f:120,f2:48,dur:.28,g:.55});},
     // airhorn: a buzina de estádio, três buzinadas estouradas (curta, curta, longa)
     airhorn(B,t){[[0,.16],[.22,.16],[.44,.65]].forEach(([dt,len])=>synth(B,t+dt,{type:'sawtooth',freqs:[415,523.25,622.25],dur:len,a:.008,f0:2600,fp:2600,fa:.01,f1:1900,q:.8,g:.24,drive:3,dets:[-14,0,14],rev:.2}));},
+    // stamp: o TUM seco do carimbo batendo na mesa
+    stamp(B,t){kick(B,t,{f:150,f2:55,dur:.22,g:.9});noise(B,t,{ft:'lowpass',f:2200,f2:400,dur:.09,g:.55});tone(B,t,{type:'triangle',f:95,f2:70,dur:.12,g:.3});},
     slam(B,t){kick(B,t,{f:130,f2:44,dur:.4,g:.4});dist(B,t,{f:130,f2:65,glide:.08,dur:.5,drive:4,lp:1000,g:.28});tone(B,t,{f:220,f2:130,glide:.06,dur:.12,g:.2});noise(B,t,{ft:'lowpass',f:1400,f2:300,dur:.18,g:.3,rev:.35});},
     // Cerimônia da lâmpada (Gustavo). zap: o estalo elétrico, bem baixinho, de cada piscada ("tick" já é o relógio do jogo)
     zap(B,t){noise(B,t,{f:3000,q:2,dur:.012,g:.05});synth(B,t,{type:'sawtooth',freqs:[100],dur:.07,a:.004,f0:400,fp:400,f1:400,q:.5,g:.015,dets:[0]});},
@@ -2962,14 +2971,15 @@ function cerBeats(){
 /* Estilo "explosao" (Vaz): no lugar da revelação dourada, uma edição tosca de propósito. O BUM toca antes e a explosão
    chega meio segundo atrasada: um GIF de pixel grosso, travado, com o xadrez de PNG falso, fora do lugar e cortado
    seco no meio da fumaça. Depois, três zooms secos na cara (DUN, DUN, DUUUN), um óculos pixelado desce do alto e
-   encaixa, a buzina de estádio e o nome. BOOM_T: os tempos (ms) depois da revelação. */
-const BOOM_T={blast:500,zoom:2500,zoomStep:450,zoomEnd:4300,shades:4400,shadesDur:1400,horn:5800,name:6000,act:6800};
+   encaixa, a buzina de estádio e o nome batendo como um carimbo. BOOM_T: os tempos (ms) depois da revelação. */
+const BOOM_T={blast:500,zoom:2500,zoomStep:450,zoomEnd:4300,shades:4400,shadesDur:1400,horn:5800,name:7000,act:7700};
 function boomReveal(){
   const T=BOOM_T;cerBedStop();SFX.play('kaboom');
   cerAt(T.blast,()=>{cerAdd('s5');boomBlast();});
   cerAt(T.zoom,boomZoom);[0,1,2].forEach(k=>cerAt(T.zoom+k*T.zoomStep,()=>SFX.play('dun',{k})));
   cerAt(T.shades,()=>boomShades(false));cerAt(T.horn,()=>SFX.play('airhorn'));
-  cerAt(T.name,()=>cerAdd('s7'));cerAt(T.act,()=>cerAdd('s8'));
+  cerAt(T.name,()=>{cerAdd('s7');cerAt(170,()=>{SFX.play('stamp');$('cer').animate([{translate:'0 6px',easing:'steps(1,end)'},{translate:'0 -3px',easing:'steps(1,end)'},{translate:'0 0'}],{duration:150});});});
+  cerAt(T.act,()=>cerAdd('s8'));
 }
 /* Onde ficam os olhos na tela: o hall.json diz onde estão na foto ("oculos": [x, y, largura, giro], frações da foto e
    graus); aqui vira posição dentro do quadro, que corta a foto com object-fit: cover. */
