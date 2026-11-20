@@ -571,7 +571,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.lit .cer-bulb{background:radial-gradient(circle at 50% 40%,#fffbea,#ffe3a6 38%,#c79a4c 72%);box-shadow:0 0 16px 6px rgb(255 226 160 / .55),0 0 70px 24px rgb(255 210 140 / .22)}
 .cer.t-lampada .cer-cone{display:block;position:absolute;left:50%;top:0;z-index:0;width:min(170vw,1150px);height:125vh;translate:-50% 0;pointer-events:none;opacity:0;
   /* a luz nasce na lâmpada (fim do fio) e espalha pra todo lado, mais pra baixo */
-  background:radial-gradient(ellipse 30% 56% at 50% calc(clamp(44px,9vh,90px) + 26px),rgb(255 228 176 / .2),rgb(255 214 150 / .07) 48%,transparent 74%)}
+  background:radial-gradient(ellipse 30% 56% at 50% calc(clamp(44px,9vh,90px) + 26px),rgb(255 228 176 / .13),rgb(255 214 150 / .045) 48%,transparent 74%)} /* luz fraca: o quarto quase sem luz */
 .cer.t-lampada.lit .cer-cone{opacity:1}
 /* cartas do Bufão lá no fundo: atrás do pedestal (camada 1, a coluna é a 2), cinzas e pequenas. Caem do teto até a
    altura do pedestal (--fy, medido) e vão escurecendo longe da lâmpada até sumir no preto. .cf desce; a carta balança
@@ -603,7 +603,7 @@ input[type=range]{accent-color:var(--brass);width:100%}
 .cer.t-lampada .cer-mon{opacity:1;transform:none;transition:none}
 /* luz apagada: o quarto some (pedestal, nome e ele); só a lâmpada continua ali, fria */
 .cer.t-lampada:not(.lit) .cer-mon{opacity:.06}
-.cer.t-lampada .cer-pic img,.cer.t-lampada .cer-pic .mono{filter:none;transition:none;opacity:0}
+.cer.t-lampada .cer-pic img,.cer.t-lampada .cer-pic .mono{filter:brightness(.72);transition:none;opacity:0} /* ele no escuro, pouca luz batendo */
 /* ele aparece num fade-in rápido, mesmo com a luz falhando: o fade é na foto e a piscada apaga o quarto (.cer-mon), então
    quando a luz volta ele está mais inteiro. Pular ou animação reduzida: inteiro na hora. */
 .cer.t-lampada.s5 .cer-pic img,.cer.t-lampada.s5 .cer-pic .mono{opacity:1;transition:opacity .4s ease-out}
