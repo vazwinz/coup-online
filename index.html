@@ -2968,14 +2968,14 @@ function cerBeats(){
   cerAt(T.drop,()=>{if(CER.bed)CER.bed.drop();}); // corte seco: um instante de silêncio antes do impacto
   cerAt(T.reveal,$('cer').classList.contains('t-boom')?boomReveal:cerReveal);
 }
-/* Estilo "explosao" (Vaz): no lugar da revelação dourada, uma edição tosca de propósito. O BUM toca antes e a explosão
-   chega meio segundo atrasada: um GIF de pixel grosso, travado, com o xadrez de PNG falso, fora do lugar e cortado
+/* Estilo "explosao" (Vaz): no lugar da revelação dourada, uma edição tosca de propósito. O BUM e a explosão vêm juntos:
+   um GIF de pixel grosso, travado, com o xadrez de PNG falso, fora do lugar e cortado
    seco no meio da fumaça. Depois, três zooms secos na cara (DUN, DUN, DUUUN), um óculos pixelado desce do alto e
    encaixa, a buzina de estádio e o nome batendo como um carimbo. BOOM_T: os tempos (ms) depois da revelação. */
-const BOOM_T={blast:500,zoom:2500,zoomStep:450,zoomEnd:4300,shades:4400,shadesDur:1400,horn:5800,name:7000,act:7700};
+const BOOM_T={zoom:2000,zoomStep:450,zoomEnd:3800,shades:3900,shadesDur:1400,horn:5300,name:6500,act:7200};
 function boomReveal(){
   const T=BOOM_T;cerBedStop();SFX.play('kaboom');
-  cerAt(T.blast,()=>{cerAdd('s5');boomBlast();});
+  cerAdd('s5');boomBlast();
   cerAt(T.zoom,boomZoom);[0,1,2].forEach(k=>cerAt(T.zoom+k*T.zoomStep,()=>SFX.play('dun',{k})));
   cerAt(T.shades,()=>boomShades(false));cerAt(T.horn,()=>SFX.play('airhorn'));
   cerAt(T.name,()=>{cerAdd('s7');cerAt(170,()=>{SFX.play('stamp');$('cer').animate([{translate:'0 6px',easing:'steps(1,end)'},{translate:'0 -3px',easing:'steps(1,end)'},{translate:'0 0'}],{duration:150});});});
